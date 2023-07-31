@@ -1,7 +1,7 @@
 var express = require('express')
 var router = express.Router()
 
-const Exemple = require('@models/exemple')
+// const Exemple = require('@models/exemple')
 
 const uid2 = require('uid2')
 const bcrypt = require('bcrypt')
