@@ -12,7 +12,9 @@
     "@modules": "modules",
     "@routes": "routes"
   },
-  "_moduleDirectories": ["node_modules_custom"],
+  "_moduleDirectories": [
+    "node_modules_custom"
+  ],
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cookie-parser": "~1.4.4",
@@ -21,10 +23,10 @@
     "dotenv": "^16.3.1",
     "express": "~4.16.1",
     "module-alias": "^2.2.3",
-    "mongoose": "^7.3.4",
-    "nodemon": "^3.0.1",
+    "mongoose": "^7.4.1",
     "morgan": "~1.9.1",
-    "node-fetch": "^3.3.1",
+    "node-fetch": "2",
+    "nodemon": "^3.0.1",
     "uid2": "^1.0.0"
   }
 }
