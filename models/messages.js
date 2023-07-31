@@ -4,11 +4,7 @@ const messagesSchema = mongoose.Schema({
   messages: String,
   date: Date,
 
-  eleve: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'eleves'
-  },
-  professionnel: {
+  expediteur: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'profs'
   }, 

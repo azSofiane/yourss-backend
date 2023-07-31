@@ -1,23 +1,24 @@
 const mongoose = require('mongoose')
 
-const ProfSchema = mongoose.Schema({
+const ProfessionnelsSchema = mongoose.Schema({
   nom: String,
   prenom: String,
   societe: String,
   email: String,
-  mot_de_passe:String,
-  token:String,
-  fonction:String,
-  photos:String,
+  mot_de_passe: String,
+  token: String,
+  fonction: Boolean,
+  photos: String,
   parcours_professionnel: String,
   presentation: String,
   conseil_métier:String,
+  resetPasswordToken: String,
   eleve_favori: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'eleves'
   }, 
 }, { versionKey: false })
 
-const Prof = mongoose.model('profs', ProfSchema)
+const Professionnel = mongoose.model('professionnels', ProfessionnelsSchema)
 
-module.exports = Prof
+module.exports = Professionnel

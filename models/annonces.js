@@ -14,10 +14,10 @@ const annoncesSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'profs'
   }, 
-  eleve_postuler: {
+  eleve_postuler: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'eleves'
-  },
+  }],
 }, { versionKey: false })
 
 const Ann = mongoose.model('annonces', annoncesSchema)
