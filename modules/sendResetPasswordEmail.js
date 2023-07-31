@@ -4,9 +4,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   auth: {
-    type: 'login',
-    user: 'yourslacapsule@gmail.com',
-    pass: 'yours!123',
+    user: 'yourslacapsule@gmail.com', 
+    pass: 'jislphrmtbbfruqj',
   },
 });
 
@@ -16,10 +15,10 @@ function sendResetPasswordEmail(email, resetToken) {
 
   // Configurations de l'e-mail
   const mailOptions = {
-    from: 'yourslacapsule@gmail.com', //à changer dynamiquement
+    from: 'yourslacapsule@gmail.com', 
     to: email,
     subject: 'Réinitialisation de mot de passe',
-    html: `<p>Bonjour,</p><p>Vous avez demandé une réinitialisation de mot de passe.</p><p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p><p><a href="${resetLink}">${resetLink}</a></p><p>Si vous n'avez pas effectué cette demande, veuillez ignorer cet e-mail.</p><p>Cordialement,<br>L'équipe de votre application</p>`,
+    html: `<p>Bonjour,</p><p>Vous avez demandé une réinitialisation de mot de passe.</p><p>Veuillez cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :</p><p><a href="${resetLink}">${resetLink}</a></p><p>Si vous n'avez pas effectué cette demande, veuillez ignorer cet e-mail.</p><p>Cordialement,<br>Edwin de l'équipe Yours</p>`,
   };
 
   // Envoi de l'e-mail
