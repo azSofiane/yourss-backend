@@ -24,7 +24,7 @@ const elevesSchema = mongoose.Schema({
   annonce_favori: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'annonces'
-  }, 
+  },
 }, { versionKey: false })
 
 const Eleve = mongoose.model('eleves', elevesSchema)
