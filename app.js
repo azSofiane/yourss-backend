@@ -11,6 +11,7 @@ var logger = require('morgan')
 var indexRouter = require('@routes/index')
 var professionnelsRouter = require('@routes/professionnels')
 var elevesRouter = require('@routes/eleves')
+var annoncesRouter = require('./routes/annonces');
 
 var app = express()
 
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', indexRouter)
 app.use('/professionnels', professionnelsRouter)
 app.use('/eleves', elevesRouter)
+app.use('/annonces', annoncesRouter)
 
 
 module.exports = app
