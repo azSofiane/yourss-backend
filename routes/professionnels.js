@@ -31,12 +31,6 @@ router.post('/signup', (req, res) => {
     return;
   };*/
 
-  // Vérifiez si la valeur "fonction" est un Boolean
-  /*if(typeof req.body.fonction !== 'boolean' ){
-    res.json({ result: false, error: 'Tu te fou de ma gueule !'});
-    return;
-  }*/
-
   // Vérifiez si la valeur est true ou false
   /*if(req.body.fonction !== 'true' && req.body.fonction !== 'false'){
     res.json({ result: false, error: ' Bien essayé !'});

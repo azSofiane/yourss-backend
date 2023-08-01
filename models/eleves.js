@@ -7,7 +7,10 @@ const elevesSchema = mongoose.Schema({
   mot_de_passe: String,
   token: String,
   resetToken: String,
-  fonction: Boolean,
+  fonction: {
+    type: String,
+    default: 'true'
+  },
   photos: String,
   date_de_naissance: String,
   etablissement: String,
@@ -24,7 +27,7 @@ const elevesSchema = mongoose.Schema({
   annonce_favori: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'annonces'
-  },
+  }
 }, { versionKey: false })
 
 const Eleve = mongoose.model('eleves', elevesSchema)

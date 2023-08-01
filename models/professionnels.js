@@ -6,7 +6,10 @@ const ProfessionnelsSchema = mongoose.Schema({
   email: String,
   mot_de_passe: String,
   token: String,
-  fonction: Boolean,
+  fonction: {
+    type: String,
+    default: 'false'
+  },
   photos: String,
   societe: String,
   presentation: String,
@@ -16,7 +19,7 @@ const ProfessionnelsSchema = mongoose.Schema({
   eleve_favori: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'eleves'
-  },
+  }
 }, { versionKey: false })
 
 const Professionnel = mongoose.model('professionnels', ProfessionnelsSchema)
