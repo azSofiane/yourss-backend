@@ -9,8 +9,8 @@ const ProfessionnelsSchema = mongoose.Schema({
   fonction: Boolean,
   photos: String,
   societe: String,
-  parcours_professionnel: String,
   presentation: String,
+  parcours_professionnel: String,
   conseil_métier:String,
   resetToken: String,
   eleve_favori: {
