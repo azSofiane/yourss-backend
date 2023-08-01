@@ -10,9 +10,8 @@ var logger = require('morgan')
 
 var indexRouter = require('@routes/index')
 var professionnelsRouter = require('@routes/professionnels')
-var profil_professionnelsRouter = require('@routes/professionnels')
-
 var elevesRouter = require('@routes/eleves')
+
 var app = express()
 
 const cors = require('cors')
@@ -26,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', indexRouter)
 app.use('/professionnels', professionnelsRouter)
-app.use('/profil_professionnels', profil_professionnelsRouter)
 app.use('/eleves', elevesRouter)
+
 
 module.exports = app

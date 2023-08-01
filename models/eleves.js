@@ -7,7 +7,7 @@ const elevesSchema = mongoose.Schema({
   mot_de_passe: String,
   token: String,
   resetToken: String,
-  fonction: String,
+  fonction: Boolean,
   photos: String,
   date_de_naissance: String,
   etablissement: String,

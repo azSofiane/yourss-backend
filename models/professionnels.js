@@ -12,7 +12,7 @@ const ProfessionnelsSchema = mongoose.Schema({
   parcours_professionnel: String,
   presentation: String,
   conseil_métier:String,
-  resetPasswordToken: String,
+  resetToken: String,
   eleve_favori: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'eleves'

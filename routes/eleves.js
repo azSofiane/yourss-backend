@@ -26,10 +26,24 @@ const { isStrongPassword } = require('@modules/passwordValidator');
   };
 
   // Vérifiez si le mot de passe est très fort
-//   if (!isStrongPassword(req.body.mot_de_passe)) {
-//     res.json({ result: false, error: 'Le mot de passe doit comporter au moins 8 caractères, dont au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial (@$!%*?&)',});
-//     return;
-//   };
+
+  //   if (!isStrongPassword(req.body.mot_de_passe)) {
+  //     res.json({ result: false, error: 'Le mot de passe doit comporter au moins 8 caractères, dont au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial (@$!%*?&)',});
+  //     return;
+  //   };
+
+    //Verifie si la valeur "fonction" est un Boolean
+
+    // if(typeof req.body.fonction !== 'boolean' ){
+    //   res.json({ result: false, error: 'Tu te fou de ma gueule !'});
+    //   return;
+    // }
+
+    if(req.body.fonction !== 'true' && req.body.fonction !== 'false'){
+      res.json({ result: false, error: ' Bien essayé !'});
+      console.log(req.body.fonction)
+      return;
+    }
 
     // Vérifiez si l'utilisateur n'est pas déjà inscrit
     Eleve.findOne({ email: req.body.email }).then(data =>{
@@ -86,8 +100,8 @@ const { isStrongPassword } = require('@modules/passwordValidator');
     }
   
     // Rechercher l'utilisateur dans la base de données
-    Eleve.findOne({ email }).then(user => {
-      if (!user) {
+    Eleve.findOne({ email }).then(utilisateur => {
+      if (!utilisateur) {
         return res.json({ result: false, error: 'Adresse e-mail non trouvée' });
       }
   
@@ -95,10 +109,10 @@ const { isStrongPassword } = require('@modules/passwordValidator');
       const resetToken = uid2(32);
   
       // Enregistrer le jeton de réinitialisation dans la base de données pour l'utilisateur
-      user.resetToken = resetToken;
-      user.save().then(() => {
+      utilisateur.resetToken = resetToken;
+      utilisateur.save().then(() => {
         // Envoyer le jeton de réinitialisation à l'adresse e-mail de l'utilisateur
-        sendResetPasswordEmail(user.email, resetToken);
+        sendResetPasswordEmail(utilisateur.email, resetToken);
   
         res.json({ result: true, message: 'Instructions de réinitialisation de mot de passe envoyées à votre adresse e-mail' });
       });
@@ -110,19 +124,19 @@ const { isStrongPassword } = require('@modules/passwordValidator');
     const { email, resetToken, newMpot_de_passe } = req.body;
   
     // Vérifier si le jeton de réinitialisation est valide et correspond à l'utilisateur dans la base de données
-    Eleve.findOne({ email, resetToken }).then(user => {
-      if (!user) {
+    Eleve.findOne({ email, resetToken }).then(utilisateur => {
+      if (!utilisateur) {
         return res.json({ result: false, error: 'Jeton de réinitialisation invalide ou expiré' });
       }
   
       // Mettre à jour le mot de passe avec le nouveau mot de passe haché
       const hash = bcrypt.hashSync(newMpot_de_passe, 10);
-      user.mot_de_passe = hash;
+      utilisateur.mot_de_passe = hash;
   
       // Supprimer le jeton de réinitialisation
-      user.resetToken = undefined;
+      utilisateur.resetToken = undefined;
   
-      user.save().then(() => {
+      utilisateur.save().then(() => {
         res.json({ result: true, message: 'Le mot de passe a été réinitialisé avec succès' });
       });
     });
