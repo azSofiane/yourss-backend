@@ -101,7 +101,7 @@ router.post('/signin', (req, res) => {
 
 
 // DEMANDE MOT DE PASSE OUBLIE
-//REINITIALISATION DE MOT DE PASSE
+//DEMANDE REINITIALISATION DE MOT DE PASSE
 
 //----------------------------------------
 
@@ -134,6 +134,7 @@ router.post('/forgot-password', (req, res) => {
   });
 });
 
+//REINITIALISATION DE MOT DE PASSE
 // Route pour  la réinitialisation de mot de passe
 router.post('/reset-password', (req, res) => {
   const { email, resetToken, newMot_de_passe } = req.body;
