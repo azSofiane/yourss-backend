@@ -2,7 +2,7 @@ var express = require('express')
 var router = express.Router()
 
 const Eleve= require ('@models/eleves');
-const uid2 = require('uid2')
+const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
 const { checkBody } = require('@modules/checkBody')
@@ -10,78 +10,6 @@ const { cleanSpace } = require('@modules/cleanSpace')
 const { isValidEmail } = require('@modules/emailValidator');
 const { sendResetPasswordEmail } = require('@modules/sendResetPasswordEmail');
 const { isStrongPassword } = require('@modules/passwordValidator');
-
-// Routes post pour s'enregistrer en tant qu'élève
-router.post('/signup', (req, res) => {
-  // Vérifiez si les champs sont remplies
-  if (!checkBody(req.body, ['nom', 'prenom', 'email', 'fonction', 'mot_de_passe'])) {
-    res.json({ result: false, error: 'Champs manquants ou vides' });
-    return
-  };
-
-  // Validez l'adresse e-mail avec la regex EMAIL_REGEX
-  if (!isValidEmail(req.body.email)) {
-    res.json({ result: false, error: 'Adresse e-mail invalide' });
-    return;
-  };
-
-  // Vérifiez si le mot de passe est très fort
-  /*if (!isStrongPassword(req.body.mot_de_passe)) {
-    res.json({ result: false, error: 'Le mot de passe doit comporter au moins 8 caractères, dont au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial (@$!%*?&)' });
-    return;
-  };*/
-
-  // Vérifiez si la valeur est true ou false
-  /*if(req.body.fonction !== 'true' && req.body.fonction !== 'false'){
-    res.json({ result: false, error: ' Bien essayé !'});
-    return;
-  }*/
-
-  // Vérifiez si l'utilisateur n'est pas déjà inscrit
-  Eleve.findOne({ email: req.body.email }).then(data =>{
-    if(data === null) {
-      const hash = bcrypt.hashSync(req.body.mot_de_passe, 10);
-
-      const newEleve = new Eleve({
-        nom: req.body.nom,
-        prenom: req.body.prenom,
-        email: req.body.email,
-        fonction: req.body.fonction,
-        mot_de_passe: hash,
-        token: uid2(32),
-      }).save().then(newDoc => {
-        res.json({ result: true, token: newDoc.token });
-      });
-    } else {
-      // L'utilisateur existe déjà dans la base de données.
-      res.json({ result: false, error: 'L\'utilisateur existe déjà' });
-    };
-  });
-});
-
-// Routes post pour se connecter en tant qu'élève
-router.post('/signin', (req, res) => {
-  // Vérifiez si les champs sont remplies
-  if (!checkBody(req.body, ['email', 'mot_de_passe'])) {
-    res.json({ result: false, error: 'Champs manquants ou vides' });
-    return;
-  };
-
-  // Validez l'adresse e-mail avec la regex EMAIL_REGEX
-  if (!isValidEmail(req.body.email)) {
-    res.json({ result: false, error: 'Adresse e-mail invalide' });
-    return;
-  };
-
-  // Rechercher l'utilisateur dans la base de données
-  Eleve.findOne({ email: req.body.email }).then(data => {
-    if (data && bcrypt.compareSync(req.body.mot_de_passe, data.mot_de_passe)) {
-      res.json({ result: true, token: data.token });
-    } else {
-      res.json({ result: false, error: 'Utilisateur introuvable ou mot de passe incorrect' });
-    }
-  });
-});
 
 // Route pour demander la réinitialisation de mot de passe
 router.post('/forgot-password', (req, res) => {
