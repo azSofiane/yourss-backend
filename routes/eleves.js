@@ -59,30 +59,6 @@ router.post('/signup', (req, res) => {
   });
 });
 
-// Routes post pour se connecter en tant qu'élève
-router.post('/signin', (req, res) => {
-  // Vérifiez si les champs sont remplies
-  if (!checkBody(req.body, ['email', 'mot_de_passe'])) {
-    res.json({ result: false, error: 'Champs manquants ou vides' });
-    return;
-  };
-
-  // Validez l'adresse e-mail avec la regex EMAIL_REGEX
-  if (!isValidEmail(req.body.email)) {
-    res.json({ result: false, error: 'Adresse e-mail invalide' });
-    return;
-  };
-
-  // Rechercher l'utilisateur dans la base de données
-  Eleve.findOne({ email: req.body.email }).then(data => {
-    if (data && bcrypt.compareSync(req.body.mot_de_passe, data.mot_de_passe)) {
-      res.json({ result: true, token: data.token });
-    } else {
-      res.json({ result: false, error: 'Utilisateur introuvable ou mot de passe incorrect' });
-    }
-  });
-});
-
 // Route pour demander la réinitialisation de mot de passe
 router.post('/forgot-password', (req, res) => {
   const { email } = req.body;

@@ -9,9 +9,10 @@ var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 
 var indexRouter = require('@routes/index')
+var connexionRouter = require('@routes/connexion')
 var professionnelsRouter = require('@routes/professionnels')
 var elevesRouter = require('@routes/eleves')
-var annoncesRouter = require('./routes/annonces');
+var annoncesRouter = require('./routes/annonces')
 var reinisialisermdpRouter = require('@routes/reinisialisermdp')
 
 var app = express()
@@ -28,11 +29,8 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', indexRouter)
 app.use('/professionnels', professionnelsRouter)
 app.use('/eleves', elevesRouter)
-<<<<<<< HEAD
+app.use('/connexion', connexionRouter)
 app.use('/annonces', annoncesRouter)
-=======
 app.use('/reinisialisermdp', reinisialisermdpRouter)
->>>>>>> origin
-
 
 module.exports = app
