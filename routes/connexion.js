@@ -30,22 +30,16 @@ router.post('/', async (req, res) => {
   ]);
 
   // verifier si il trouve avec le mail un utilisateur et si oui que le mot de passe correspond
-  if(((!eleve && !professionnel) || (eleve && !bcrypt.compareSync(mot_de_passe, eleve.mot_de_passe)) || (professionnel && !bcrypt.compareSync(mot_de_passe, professionnel.mot_de_passe)))){
+  const isEleve = eleve && bcrypt.compareSync(mot_de_passe, eleve.mot_de_passe);
+  const isProfessionnel = professionnel && bcrypt.compareSync(mot_de_passe, professionnel.mot_de_passe);
+
+  if (!isEleve && !isProfessionnel) {
     return res.json({ result: false, error: 'Adresse e-mail ou mot de passe incorrect' });
-  }
-
-  let token;
-  let userType;
-
-  if(eleve && bcrypt.compareSync(mot_de_passe, eleve.mot_de_passe)){
-    token = eleve?.token;
-    userType = 'true';
   };
 
-  if (professionnel && bcrypt.compareSync(mot_de_passe, professionnel.mot_de_passe)) {
-    token = professionnel?.token;
-    userType = 'false';
-  };
+  const newUtilisateur = isEleve ? eleve : professionnel;
+  const userType = isEleve ? 'true' : 'false';
+  const token = newUtilisateur?.token;
 
   return res.json({ result: true, token, fonction: userType });
 });
