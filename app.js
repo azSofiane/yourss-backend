@@ -12,6 +12,7 @@ var indexRouter = require('@routes/index')
 var professionnelsRouter = require('@routes/professionnels')
 var elevesRouter = require('@routes/eleves')
 var annoncesRouter = require('./routes/annonces');
+var reinisialisermdpRouter = require('@routes/reinisialisermdp')
 
 var app = express()
 
@@ -27,7 +28,11 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', indexRouter)
 app.use('/professionnels', professionnelsRouter)
 app.use('/eleves', elevesRouter)
+<<<<<<< HEAD
 app.use('/annonces', annoncesRouter)
+=======
+app.use('/reinisialisermdp', reinisialisermdpRouter)
+>>>>>>> origin
 
 
 module.exports = app

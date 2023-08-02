@@ -31,12 +31,6 @@ router.post('/signup', (req, res) => {
     return;
   };*/
 
-  // Vérifiez si la valeur "fonction" est un Boolean
-  /*if(typeof req.body.fonction !== 'boolean' ){
-    res.json({ result: false, error: 'Tu te fou de ma gueule !'});
-    return;
-  }*/
-
   // Vérifiez si la valeur est true ou false
   /*if(req.body.fonction !== 'true' && req.body.fonction !== 'false'){
     res.json({ result: false, error: ' Bien essayé !'});
@@ -142,7 +136,7 @@ router.post('/reset-password', (req, res) => {
   });
 });
 
-// todo - revoir verification pour mail, mot de passe (token aussi) et date de naissance (voir si une nouvelle route ou plusieurs conditions dans la route de modification)
+// todo - revoir verification pour mail, photo, mot de passe (token aussi) et date de naissance (voir si une nouvelle route ou plusieurs conditions dans la route de modification)
 // Route pour modifier le profil
 router.post('/edit', async (req, res) => {
   const { token, nom, prenom, photos, societe, presentation, parcours_professionnel, conseil_métier } = req.body;
