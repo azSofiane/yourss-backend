@@ -9,6 +9,11 @@ const annoncesSchema = mongoose.Schema({
   ville: String,
   profession: [String],
   description: String,
+  // todo - a conserver ou non Champ pour indiquer si l'annonce est active ou non
+  archive: { 
+    type: Boolean, 
+    default: false 
+  }, 
   professionnel: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'profs'
