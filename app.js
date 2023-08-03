@@ -9,12 +9,17 @@ var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 
 var indexRouter = require('@routes/index')
+
 var inscriptionRouter = require('@routes/inscription')
 var connexionRouter = require('@routes/connexion')
-var elevesRouter = require('@routes/eleves')
-var professionnelsRouter = require('@routes/professionnels')
-var annoncesRouter = require('@routes/annonces')
 var reinisialisermdpRouter = require('@routes/reinisialisermdp')
+
+var elevesRouter = require('@routes/eleves')
+var elevesRechercheRouter = require('@routes/elevesRecherche')
+
+var professionnelsRouter = require('@routes/professionnels')
+
+var annoncesRouter = require('@routes/annonces')
 
 var app = express()
 
@@ -28,11 +33,16 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', indexRouter)
+
 app.use('/inscription', inscriptionRouter)
 app.use('/connexion', connexionRouter)
-app.use('/professionnels', professionnelsRouter)
-app.use('/eleves', elevesRouter)
-app.use('/annonces', annoncesRouter)
 app.use('/reinisialisermdp', reinisialisermdpRouter)
+
+app.use('/eleves', elevesRouter)
+app.use('/eleves/recherche', elevesRechercheRouter)
+
+app.use('/professionnels', professionnelsRouter)
+
+app.use('/annonces', annoncesRouter)
 
 module.exports = app
