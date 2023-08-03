@@ -29,24 +29,41 @@ router.post('/', async (req, res) => {
     return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
   }
 
+  // variable de liste des champs modifiables
+  // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
+  let champs = { titre, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description };
+
   //conversion de date
-  // 1- Fonction pour convertir une date au format français (par exemple, "15/08/2023") en format ISO 8601 (par exemple, "2023-08-15")
-  //padStart permet de convertir en nombre entier (si 1 seul caractère, on ajoute "0" car on demande 2 caractères pour le jour et mois)
+  // 1- Fonction pour convertir une date au format français
+  //padStart permet de convertir en nombre entier (si 1 seul caractère, on ajoute "0" car on demande 2 caractères pour le jour et mois
   function convertirDateFrEnISO(dateFr) {
     const [jour, mois, annee] = dateFr.split('/');
     return `${annee}-${mois.padStart(2, '0')}-${jour.padStart(2, '0')}`;
-  }
+  };
 
-  // 2- Suppose que req.body.date_de_debut et req.body.date_de_fin contiennent les dates françaises sous forme de chaîne (par exemple, "15/08/2023")
-  const dateDebutFr = date_de_debut;
-  const dateFinFr = date_de_fin;
+  // 2- Convertit les dates françaises en format ISO 8601 (par exemple, "2023-08-15")
+  if (date_de_debut) {
+    const dateDebutFr = date_de_debut;
+    const dateDebutISO = convertirDateFrEnISO(dateDebutFr);
+    champs.date_de_debut = dateDebutISO;
+  };
 
-  // 3- Convertit les dates françaises en format ISO 8601 (par exemple, "2023-08-15")
-  const dateDebutISO = convertirDateFrEnISO(dateDebutFr);
-  const dateFinISO = convertirDateFrEnISO(dateFinFr);
+  if (date_de_fin) {
+    const dateFinFr = date_de_fin;
+    const dateFinISO = convertirDateFrEnISO(dateFinFr);
+    champs.date_de_fin = dateFinISO;
+  };
 
-  // variable de liste des champs modifiables
-  let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
+  // cela retire les espaces avant et après à la reception des données
+  const cleanClasseList = { titre, adresse, code_postal, ville };
+
+  for (const i in cleanClasseList) {
+    const cleanedField = cleanSpace(cleanClasseList[i]);
+
+    if (cleanedField !== null) {
+      champs[i] = cleanedField;
+    };
+  };
 
   // si pas de champs vides ou manquants, création de l'annonce
   const newAnnonce = new Annonce(champs).save().then(newDoc => res.json({ result: true, newAnnonce: newDoc }))
