@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 
 const annoncesSchema = mongoose.Schema({
   titre: String,
+  date_de_publication: Date,
   date_de_debut: Date,
   date_de_fin: Date,
   adresse: String,
@@ -9,15 +10,14 @@ const annoncesSchema = mongoose.Schema({
   ville: String,
   profession: [String],
   description: String,
-  // todo - a conserver ou non Champ pour indiquer si l'annonce est active ou non
-  archive: { 
-    type: Boolean, 
-    default: false 
-  }, 
+  archive: {
+    type: Boolean,
+    default: false
+  },
   professionnel: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'profs'
-  }, 
+  },
   eleves_postulants: [{
     type: mongoose.Schema.Types.ObjectId,
       eleve: {
