@@ -14,10 +14,10 @@ const { cleanSpace } = require('@modules/cleanSpace')
 // route pour création d'une annonce par le professionnel
 router.post('/', async (req, res) => {
   // création des constantes token = req.body.token, titre = req.body.titre...
-  const { token, titre, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description } = req.body;
+  const { token, titre, date_de_creation, date_de_publication, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description } = req.body;
 
   // vérifie si les champs sont remplis
-  if (!checkBody(req.body, ['titre', 'code_postal', 'ville', 'description', 'token' ])) {
+  if (!checkBody(req.body, ['titre', 'date_de_creation', 'code_postal', 'ville', 'description', 'token' ])) {
     res.json({ result: false, error: 'Champs vide(s) ou manquant(s)' });
     return;
   }
@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
 
   // variable de liste des champs modifiables
   // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
-  let champs = { titre, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description };
+  let champs = { titre, date_de_creation, date_de_publication, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description };
 
   //conversion de date
   // 1- Fonction pour convertir une date au format français
@@ -42,6 +42,18 @@ router.post('/', async (req, res) => {
   };
 
   // 2- Convertit les dates françaises en format ISO 8601 (par exemple, "2023-08-15")
+  if (date_de_creation) {
+    const dateCreationFr = date_de_creation;
+    const dateCreationISO = convertirDateFrEnISO(dateCreationFr);
+    champs.date_de_creation = dateCreationISO;
+  };
+
+  if (date_de_publication) {
+    const datePublicationFr = date_de_publication;
+    const datePublicationISO = convertirDateFrEnISO(datePublicationFr);
+    champs.date_de_publication = datePublicationISO;
+  };
+
   if (date_de_debut) {
     const dateDebutFr = date_de_debut;
     const dateDebutISO = convertirDateFrEnISO(dateDebutFr);
@@ -73,7 +85,7 @@ router.post('/', async (req, res) => {
 // route pour modifier une annonce
 router.put('/', async (req, res) => {
   // création des constantes token = req.body.token, titre = req.body.titre...
-  const { id, token, archive, titre, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description } = req.body;
+  const { id, token, archive, titre, date_de_modification, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description } = req.body;
 
   // vérifier que le token existe dans la bdd - 
   const isValidToken = await Professionnel.findOne({ token });
@@ -90,7 +102,7 @@ router.put('/', async (req, res) => {
 
   // variable de liste des champs modifiables
   // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
-  let champs = { titre, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description };
+  let champs = { titre, date_de_modification, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description };
 
   //conversion de date
   // 1- Fonction pour convertir une date au format français
@@ -101,6 +113,12 @@ router.put('/', async (req, res) => {
   };
 
   // 2- Convertit les dates françaises en format ISO 8601 (par exemple, "2023-08-15")
+  if (date_de_modification) {
+    const dateModificationFr = date_de_modification;
+    const dateModificationISO = convertirDateFrEnISO(dateModificationFr);
+    champs.date_de_modification = dateModificationISO;
+  };
+
   if (date_de_debut) {
     const dateDebutFr = date_de_debut;
     const dateDebutISO = convertirDateFrEnISO(dateDebutFr);
@@ -124,7 +142,6 @@ router.put('/', async (req, res) => {
     };
   };
 
-  
   // envoyer les modifications
   const updateResult = await Annonce.updateOne({ _id: id }, champs);
   
