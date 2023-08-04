@@ -169,10 +169,10 @@ router.put('/archive', async (req, res) => {
     return;
   };
 
-  // vérifier que le token existe dans la bdd - 
-  const isValidToken = await Professionnel.findOne({ token });
+  // // vérifier que le token existe dans la bdd - 
+  // const isValidToken = await Professionnel.findOne({ token });
 
-  if (!isValidToken) return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+  // if (!isValidToken) return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
 
   // vérifier si l'id est au bon format - 
   if (!checkIdFormat(id)) return res.json({ result: false, error: 'ID d\'annonce invalide' });
@@ -194,5 +194,13 @@ router.put('/archive', async (req, res) => {
   };
 });
 
+
+// route get pour récupérer toutes les annonces
+router.get('/', (req, res) => {
+  Annonce.find()
+  .then(data => {
+    res.json({ result: true, Annonce: data})
+  }) 
+})
 
 module.exports = router
