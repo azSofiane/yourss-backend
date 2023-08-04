@@ -24,7 +24,12 @@ var annoncesRouter = require('@routes/annonces')
 var app = express()
 
 const cors = require('cors')
-app.use(cors())
+const corsOptions = {
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true, // Permettre l'envoi des cookies lors des requêtes CORS (si besoin)
+};
+
+app.use(cors(corsOptions));
 
 app.use(logger('dev'))
 app.use(express.json())
