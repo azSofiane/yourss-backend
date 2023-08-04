@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 
 const annoncesSchema = mongoose.Schema({
   titre: String,
+  date_de_creation: Date,
+  date_de_modification: Date,
   date_de_publication: Date,
   date_de_debut: Date,
   date_de_fin: Date,
