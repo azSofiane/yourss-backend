@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 
 function sendResetPasswordEmail(email, resetToken) {
   // Créez le lien de réinitialisation avec le jeton et l'URL de réinitialisation de mot de passe (à remplacer par l'URL réelle de votre application)
-  const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+  const resetLink = `http://localhost:3001/resetpassword?token=${resetToken}`;
 
   // Configurations de l'e-mail
   const mailOptions = {

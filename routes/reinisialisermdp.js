@@ -6,10 +6,12 @@ const Professionnel = require('@models/professionnels');
 const uid2 = require('uid2')
 const bcrypt = require('bcrypt')
 
+
+
 const { checkBody } = require('@modules/checkBody')
 const { isValidEmail } = require('@modules/emailValidator')
 const { sendResetPasswordEmail } = require('@modules/sendResetPasswordEmail');
-
+const useDispatch = () => useDispatch();
 // Route pour demander la réinitialisation de mot de passe
 router.post('/forgot-password', async (req, res) => {
   if (!checkBody(req.body, ['email'])) {
@@ -54,17 +56,17 @@ router.post('/forgot-password', async (req, res) => {
 
 // Route pour la réinitialisation de mot de passe
 router.post('/reset-password', async (req, res) => {
-  const { email, resetToken, mot_de_passe } = req.body;
+  const {  resetToken, mot_de_passe } = req.body;
   
   // Vérifier si l'adresse e-mail est valide
-  if (!isValidEmail(email)) {
-    return res.json({ result: false, error: 'Adresse e-mail invalide' });
-  }
+  // if (!isValidEmail(email)) {
+  //   return res.json({ result: false, error: 'Adresse e-mail invalide' });
+  // }
 
   // Rechercher l'utilisateur dans les collections "eleves" et "professionnels" en utilisant le jeton de réinitialisation
   const [eleve, professionnel] = await Promise.all([
-    Eleve.findOne({ email, resetToken: resetToken }),
-    Professionnel.findOne({ email, resetToken: resetToken }),
+    Eleve.findOne({  resetToken: resetToken }),
+    Professionnel.findOne({ resetToken: resetToken }),
   ]);
 
   if (!eleve && !professionnel) {
@@ -80,14 +82,14 @@ router.post('/reset-password', async (req, res) => {
   // Mettre à jour le mot de passe de l'utilisateur trouvé
   const utilisateur = eleve || professionnel;
   utilisateur.mot_de_passe = hash;
-  utilisateur.token = uid2(32); // Générer un jeton de réinitialisation unique
+  utilisateur.token = uid2(32);  // Générer un jeton de réinitialisation unique
   utilisateur.resetToken = undefined; // Effacer le jeton de réinitialisation après la réinitialisation 
 
   try {
     await utilisateur.save();
-    res.json({ result: true, message: 'Mot de passe réinitialisé avec succès' });
+    res.json({ result: true, message: 'Mot de passe réinitialisé avec succès', resetToken: utilisateur.token});
   } catch (error) {
-    res.json({ result: false, error: 'Erreur lors de la sauvegarde du nouveau mot de passe' });
+    res.status(500).json({ result: false, error: 'Erreur lors de la sauvegarde du nouveau mot de passe' });
   }
 
 });
