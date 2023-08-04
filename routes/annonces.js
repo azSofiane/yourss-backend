@@ -75,12 +75,12 @@ router.put('/', async (req, res) => {
   // création des constantes token = req.body.token, titre = req.body.titre...
   const { id, token, archive, titre, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description } = req.body;
 
-  // vérifier que le token existe dans la bdd - 
+  // vérifier que le token existe dans la bdd -
   const isValidToken = await Professionnel.findOne({ token });
 
   if (!isValidToken) return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
 
-  // vérifier si l'id est au bon format - 
+  // vérifier si l'id est au bon format -
   if (!checkIdFormat(id)) return res.json({ result: false, error: 'ID d\'annonce invalide' });
 
   // vérifier que l'annonce existe dans la bdd -  (async donc result décalé)
@@ -124,12 +124,12 @@ router.put('/', async (req, res) => {
     };
   };
 
-  
+
   // envoyer les modifications
   const updateResult = await Annonce.updateOne({ _id: id }, champs);
-  
+
   if (updateResult.modifiedCount > 0) {
-    console.log(updateResult); 
+    console.log(updateResult);
     return res.json({ result: true, message: 'Mise à jour réussie !' });
   } else {
     return res.json({ result: false, message: 'Aucun changement effectuée' });
@@ -142,31 +142,31 @@ router.put('/archive', async (req, res) => {
   // création des constantes token = req.body.token, titre = req.body.titre...
   const { id, token, archive } = req.body;
 
-  // todo - faire en un module 
+  // todo - faire en un module
   // Vérifiez si la valeur "archive" est un Boolean
     if(typeof archive !== 'boolean'){
     res.json({ result: false, error: 'envoi moi un booléen stp'});
     return;
   };
 
-  // vérifier que le token existe dans la bdd - 
+  // vérifier que le token existe dans la bdd -
   const isValidToken = await Professionnel.findOne({ token });
 
   if (!isValidToken) return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
 
-  // vérifier si l'id est au bon format - 
+  // vérifier si l'id est au bon format -
   if (!checkIdFormat(id)) return res.json({ result: false, error: 'ID d\'annonce invalide' });
 
   // vérifier que l'annonce existe dans la bdd -  (async donc result décalé)
   const isValidAnnonce = await Annonce.findById(id);
 
   if (!isValidAnnonce) return res.json({ result: false, message: 'Annonce pas trouvée ou archivée' });
-  
-  
+
+
   // envoyer la modification pour archivage de l'annonce
   const updateResult = await Annonce.updateOne({ _id: id }, { archive });
-  
-  
+
+
   if (updateResult.modifiedCount > 0) {
     return res.json({ result: true, message: 'Mise à jour réussie!' });
   } else {

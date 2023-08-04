@@ -1,12 +1,12 @@
-var express = require('express')
-var router = express.Router()
+var express = require('express');
+var router = express.Router();
 
 const Eleve= require ('@models/eleves');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
-const { checkBody } = require('@modules/checkBody')
-const { cleanSpace } = require('@modules/cleanSpace')
+const { checkBody } = require('@modules/checkBody');
+const { cleanSpace } = require('@modules/cleanSpace');
 const { isValidEmail } = require('@modules/emailValidator');
 const { sendResetPasswordEmail } = require('@modules/sendResetPasswordEmail');
 const { isStrongPassword } = require('@modules/passwordValidator');
@@ -64,16 +64,26 @@ router.post('/reset-password', (req, res) => {
   });
 });
 
-// todo - revoir verification pour mail, mot de passe (token aussi) et date de naissance (voir si une nouvelle route ou plusieurs conditions dans la route de modification)
+// Route qui verifie un token
+router.get('/:token', (req, res) => {
+  Eleve.findOne({ token: req.params.token })
+  .select('-_id -email -mot_de_passe -token -fonction')
+  .then(data => {
+    data ? result = true : result = false;
+
+    res.json({ result, data });
+  });
+});
+
 // Route pour modifier le profil
-router.post('/edit', async (req, res) => {
-  const { token, nom, prenom, photos, etablissement, presentation, motivation, ville, code_postal, classe, disponible, date_de_debut, date_de_fin, ma_recherche_de_stage, mot_cle } = req.body;
+router.put('/edit/:token', async (req, res) => {
+  const { nom, prenom, photos, etablissement, presentation, motivation, ville, code_postal, disponible, date_de_debut, date_de_fin, ma_recherche_de_stage, mot_cle } = req.body;
 
   // variable de liste des champs modifiables
-  let champs = { nom, prenom, photos, etablissement, presentation, motivation, ville, code_postal, classe, disponible, date_de_debut, date_de_fin, ma_recherche_de_stage, mot_cle };
+  let champs = { nom, prenom, photos, etablissement, presentation, motivation, ville, code_postal, disponible, date_de_debut, date_de_fin, ma_recherche_de_stage, mot_cle };
 
   // cela retire les espaces avant et après à la reception des données
-  const cleanClasseList = { nom, prenom, etablissement, ville, code_postal, classe };
+  const cleanClasseList = { nom, prenom, etablissement, ville, code_postal };
 
   for (const i in cleanClasseList) {
     const cleanedField = cleanSpace(cleanClasseList[i]);
@@ -84,14 +94,14 @@ router.post('/edit', async (req, res) => {
   };
 
   // vérifier que le token existe dans la bdd
-  const isValidToken = await Eleve.findOne({ token });
+  const isValidToken = await Eleve.findOne({ token: req.params.token });
 
   if (!isValidToken) {
     return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
-  }
+  };
 
   // envoyer les modifications
-  const updateResult = await Eleve.updateOne({ token }, champs);
+  const updateResult = await Eleve.updateOne({ token: req.params.token }, champs);
 
   if (updateResult.modifiedCount > 0) {
     return res.json({ result: true, message: 'Mise à jour réussie !' });
