@@ -9,7 +9,6 @@ const bcrypt = require('bcrypt')
 const { checkBody } = require('@modules/checkBody')
 const { isValidEmail } = require('@modules/emailValidator')
 const { sendResetPasswordEmail } = require('@modules/sendResetPasswordEmail');
-const { isStrongPassword } = require('@modules/passwordValidator');
 
 // Route pour demander la réinitialisation de mot de passe
 router.post('/forgot-password', async (req, res) => {
@@ -17,64 +16,79 @@ router.post('/forgot-password', async (req, res) => {
     res.json({ result: false, error: 'Champs manquants ou vides' });
     return
   };
-
   const { email } = req.body;
 
   // Vérifier si l'adresse e-mail est valide
   if (!isValidEmail(email)) {
     return res.json({ result: false, error: 'Adresse e-mail invalide' });
-  };
-  
-  console.log(email)
+  }
 
-  const [professionnel, eleve] = await Promise.all([
+  // Rechercher l'utilisateur dans les collections "eleves" et "professionnels"
+  Promise.all([
+    Eleve.findOne({ email }),
     Professionnel.findOne({ email }),
-    Eleve.findOne({ email })
+  ])
+    .then(([eleve, professionnel]) => {
+      if (!eleve && !professionnel) {
+        return res.json({ result: false, error: 'Adresse e-mail invalide' });
+      }
+
+      // Générer un jeton de réinitialisation unique
+      const resetToken = uid2(32);
+
+      // Enregistrer le jeton de réinitialisation dans la base de données pour l'utilisateur trouvé
+      if (eleve) {
+        eleve.resetToken = resetToken;
+        eleve.save();
+      } else if (professionnel) {
+        professionnel.resetToken = resetToken;
+        professionnel.save();
+      }
+
+      // Envoyer le jeton de réinitialisation à l'adresse e-mail de l'utilisateur
+      sendResetPasswordEmail(email, resetToken);
+
+      res.json({ result: true, message: 'Instructions de réinitialisation de mot de passe envoyées à votre adresse e-mail' });
+    });
+});
+
+// Route pour la réinitialisation de mot de passe
+router.post('/reset-password', async (req, res) => {
+  const { email, resetToken, mot_de_passe } = req.body;
+  
+  // Vérifier si l'adresse e-mail est valide
+  if (!isValidEmail(email)) {
+    return res.json({ result: false, error: 'Adresse e-mail invalide' });
+  }
+
+  // Rechercher l'utilisateur dans les collections "eleves" et "professionnels" en utilisant le jeton de réinitialisation
+  const [eleve, professionnel] = await Promise.all([
+    Eleve.findOne({ email, resetToken: resetToken }),
+    Professionnel.findOne({ email, resetToken: resetToken }),
   ]);
 
-  console.log('01', professionnel)
-  console.log('02', eleve)
+  if (!eleve && !professionnel) {
+    return res.json({ result: false, error: 'Utilisateur non trouvé ou jeton de réinitialisation invalide' });
+  }
 
-  if(!professionnel && !eleve) {
-    return res.json({ result: false, error: 'Adresse e-mail non trouvée' });
-  };
+  // Hacher le nouveau mot de passe avant de le sauvegarder
+  if (!mot_de_passe) {
+     return res.json({ result: false, error: 'Le nouveau mot de passe est vide' });
+  }
+  const hash = bcrypt.hashSync(mot_de_passe, 10); 
+      
+  // Mettre à jour le mot de passe de l'utilisateur trouvé
+  const utilisateur = eleve || professionnel;
+  utilisateur.mot_de_passe = hash;
+  utilisateur.token = uid2(32); // Générer un jeton de réinitialisation unique
+  utilisateur.resetToken = undefined; // Effacer le jeton de réinitialisation après la réinitialisation 
 
-  let token;
-  let userType;
+  try {
+    await utilisateur.save();
+    res.json({ result: true, message: 'Mot de passe réinitialisé avec succès' });
+  } catch (error) {
+    res.json({ result: false, error: 'Erreur lors de la sauvegarde du nouveau mot de passe' });
+  }
 
-  if (professionnel) {
-    token = professionnel?.token;
-    userType = 'false';
-  } else {
-    token = eleve?.token;
-    userType = 'true';
-  };
-
-  res.json({ result: true, token, fonction: userType });
 });
-
-// todo - revoir la partie envoyer mail de reinisialisation
-// Route pour la réinitialisation de mot de passe
-router.post('/reset-password', (req, res) => {
-  const { email, resetToken, newMot_de_passe } = req.body;
-
-  // Vérifier si le jeton de réinitialisation est valide et correspond à l'utilisateur dans la base de données
-  Professionnel.findOne({ email, resetToken }).then(utilisateur => {
-    if (!utilisateur) {
-      return res.json({ result: false, error: 'Jeton de réinitialisation invalide ou expiré' });
-    }
-
-    // Mettre à jour le mot de passe avec le nouveau mot de passe haché
-    const hash = bcrypt.hashSync(newMot_de_passe, 10);
-    utilisateur.mot_de_passe = hash;
-
-    // Supprimer le jeton de réinitialisation
-    utilisateur.resetToken = undefined;
-
-    utilisateur.save().then(() => {
-      res.json({ result: true, message: 'Le mot de passe a été réinitialisé avec succès' });
-    });
-  });
-});
-
 module.exports = router;
