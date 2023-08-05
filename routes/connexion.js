@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
 
   // Vérifier si l'adresse e-mail est valide
   if (!isValidEmail(email)) {
-    return res.json({ result: false, error: 'Adresse e-mail invalide' });
+    // return res.json({ result: false, error: 'Adresse e-mail invalide' });
   };
 
   // verifier dans les deux collections le mail
