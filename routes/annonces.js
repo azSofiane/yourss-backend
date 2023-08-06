@@ -13,61 +13,29 @@ const { cleanSpace } = require('@modules/cleanSpace')
 
 // route pour création d'une annonce par le professionnel
 router.post('/', async (req, res) => {
-  // todo - remettre date_de_creation, date_de_publication, date_de_debut, date_de_fin
+  // todo - remettre 
   // création des constantes token = req.body.token, titre = req.body.titre...
-  const { token, titre,  adresse, code_postal, ville, profession, description } = req.body;
+  const { date_de_creation, date_de_publication, date_de_debut, date_de_fin, token, titre,  adresse, code_postal, ville, profession, description } = req.body;
 
-  // todo - remettre 'date_de_creation',
+  // todo - remettre 'date_de_creation', 'token' et le control sur checkbody
   // vérifie si les champs sont remplis
-  if (!checkBody(req.body, ['titre', 'code_postal', 'ville', 'description', 'token' ])) {
-    // res.json({ result: false, error: 'Champs vide(s) ou manquant(s)' });
-    // return;
+  if (!checkBody(req.body, ['titre', 'code_postal', 'ville', 'description' ])) {
+    res.json({ result: false, error: 'Champs vide(s) ou manquant(s)' });
+    return;
   }
 
   // vérifier que le token existe dans la bdd
   const isValidToken = await Professionnel.findOne({ token: token });
 
+  // todo - remettre control sur verif du token
   if (!isValidToken) {
     // return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
   }
 
-  // todo - remettre dates : date_de_creation, date_de_publication, date_de_debut, date_de_fin,
+  // todo - remettre dates : 
   // variable de liste des champs modifiables
   // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
-  let champs = { titre, adresse, code_postal, ville, profession, description };
-
-  // //conversion de date
-  // // 1- Fonction pour convertir une date au format français
-  // //padStart permet de convertir en nombre entier (si 1 seul caractère, on ajoute "0" car on demande 2 caractères pour le jour et mois
-  // function convertirDateFrEnISO(dateFr) {
-  //   const [jour, mois, annee] = dateFr.split('/');
-  //   return `${annee}-${mois.padStart(2, '0')}-${jour.padStart(2, '0')}`;
-  // };
-
-  // // 2- Convertit les dates françaises en format ISO 8601 (par exemple, "2023-08-15")
-  // if (date_de_creation) {
-  //   const dateCreationFr = date_de_creation;
-  //   const dateCreationISO = convertirDateFrEnISO(dateCreationFr);
-  //   champs.date_de_creation = dateCreationISO;
-  // };
-
-  // if (date_de_publication) {
-  //   const datePublicationFr = date_de_publication;
-  //   const datePublicationISO = convertirDateFrEnISO(datePublicationFr);
-  //   champs.date_de_publication = datePublicationISO;
-  // };
-
-  // if (date_de_debut) {
-  //   const dateDebutFr = date_de_debut;
-  //   const dateDebutISO = convertirDateFrEnISO(dateDebutFr);
-  //   champs.date_de_debut = dateDebutISO;
-  // };
-
-  // if (date_de_fin) {
-  //   const dateFinFr = date_de_fin;
-  //   const dateFinISO = convertirDateFrEnISO(dateFinFr);
-  //   champs.date_de_fin = dateFinISO;
-  // };
+  let champs = { date_de_creation, date_de_debut, date_de_publication, date_de_fin, titre, adresse, code_postal, ville, profession, description };
 
   // cela retire les espaces avant et après à la reception des données
   const cleanClasseList = { titre, adresse, code_postal, ville };
