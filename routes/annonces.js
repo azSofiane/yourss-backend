@@ -75,33 +75,6 @@ router.put('/', async (req, res) => {
   // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
   let champs = { titre, date_de_modification, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description };
 
-  //conversion de date
-  // 1- Fonction pour convertir une date au format français
-  //padStart permet de convertir en nombre entier (si 1 seul caractère, on ajoute "0" car on demande 2 caractères pour le jour et mois)
-  function convertirDateFrEnISO(dateFr) {
-    const [jour, mois, annee] = dateFr.split('/');
-    return `${annee}-${mois.padStart(2, '0')}-${jour.padStart(2, '0')}`;
-  };
-
-  // 2- Convertit les dates françaises en format ISO 8601 (par exemple, "2023-08-15")
-  if (date_de_modification) {
-    const dateModificationFr = date_de_modification;
-    const dateModificationISO = convertirDateFrEnISO(dateModificationFr);
-    champs.date_de_modification = dateModificationISO;
-  };
-
-  if (date_de_debut) {
-    const dateDebutFr = date_de_debut;
-    const dateDebutISO = convertirDateFrEnISO(dateDebutFr);
-    champs.date_de_debut = dateDebutISO;
-  };
-
-  if (date_de_fin) {
-    const dateFinFr = date_de_fin;
-    const dateFinISO = convertirDateFrEnISO(dateFinFr);
-    champs.date_de_fin = dateFinISO;
-  };
-
   // cela retire les espaces avant et après à la reception des données
   const cleanClasseList = { titre, adresse, code_postal, ville };
 
@@ -137,12 +110,10 @@ router.put('/archive', async (req, res) => {
     return;
   };
 
-  // // vérifier que le token existe dans la bdd - 
-  // const isValidToken = await Professionnel.findOne({ token });
   // vérifier que le token existe dans la bdd -
   const isValidToken = await Professionnel.findOne({ token });
 
-  // if (!isValidToken) return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+  if (!isValidToken) return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
 
   // vérifier si l'id est au bon format -
   if (!checkIdFormat(id)) return res.json({ result: false, error: 'ID d\'annonce invalide' });
@@ -152,12 +123,11 @@ router.put('/archive', async (req, res) => {
 
   if (!isValidAnnonce) return res.json({ result: false, message: 'Annonce pas trouvée ou archivée' });
 
-
   // envoyer la modification pour archivage de l'annonce
   const updateResult = await Annonce.updateOne({ _id: id }, { archive });
 
-
   if (updateResult.modifiedCount > 0) {
+    console.log(updateResult);
     return res.json({ result: true, message: 'Mise à jour réussie!' });
   } else {
     return res.json({ result: false, message: 'Aucun changement effectuée' });
@@ -166,7 +136,7 @@ router.put('/archive', async (req, res) => {
 
 
 // route get pour récupérer toutes les annonces
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   Annonce.find()
   .then(data => {
     res.json({ result: true, Annonce: data})
