@@ -66,7 +66,7 @@ router.post('/reset-password', async (req, res) => {
   // Rechercher l'utilisateur dans les collections "eleves" et "professionnels" en utilisant le jeton de réinitialisation
   const [eleve, professionnel] = await Promise.all([
     Eleve.findOne({  resetToken: resetToken }),
-    Professionnel.findOne({ resetToken: resetToken }),
+    Professionnel.findOne({  resetToken: resetToken }),
   ]);
 
   if (!eleve && !professionnel) {
