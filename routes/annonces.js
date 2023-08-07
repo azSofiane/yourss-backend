@@ -1,26 +1,37 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 
 // import modelè annonce
-const Annonce = require('@models/annonces');
-const Professionnel = require('@models/professionnels');
+const Annonce = require("@models/annonces");
+const Professionnel = require("@models/professionnels");
 
 // import du modul de controle des champs
-const { checkBody } = require('@modules/checkBody');
-const { checkIdFormat } = require('@modules/checkIdFormat')
-const { cleanSpace } = require('@modules/cleanSpace')
-
+const { checkBody } = require("@modules/checkBody");
+const { checkIdFormat } = require("@modules/checkIdFormat");
+const { cleanSpace } = require("@modules/cleanSpace");
 
 // route pour création d'une annonce par le professionnel
-router.post('/', async (req, res) => {
-  // todo - remettre 
+router.post("/", async (req, res) => {
+  // todo - remettre
   // création des constantes token = req.body.token, titre = req.body.titre...
-  const { date_de_creation, date_de_publication, date_de_debut, date_de_fin, token, titre,  adresse, code_postal, ville, profession, description } = req.body;
+  const {
+    date_de_creation,
+    date_de_publication,
+    date_de_debut,
+    date_de_fin,
+    token,
+    titre,
+    adresse,
+    code_postal,
+    ville,
+    profession,
+    description,
+  } = req.body;
 
   // todo - remettre 'date_de_creation', 'token' et le control sur checkbody
   // vérifie si les champs sont remplis
-  if (!checkBody(req.body, ['titre', 'code_postal', 'ville', 'description' ])) {
-    res.json({ result: false, error: 'Champs vide(s) ou manquant(s)' });
+  if (!checkBody(req.body, ["titre", "code_postal", "ville", "description"])) {
+    res.json({ result: false, error: "Champs vide(s) ou manquant(s)" });
     return;
   }
 
@@ -32,10 +43,21 @@ router.post('/', async (req, res) => {
     // return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
   }
 
-  // todo - remettre dates : 
+  // todo - remettre dates :
   // variable de liste des champs modifiables
   // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
-  let champs = { date_de_creation, date_de_debut, date_de_publication, date_de_fin, titre, adresse, code_postal, ville, profession, description };
+  let champs = {
+    date_de_creation,
+    date_de_debut,
+    date_de_publication,
+    date_de_fin,
+    titre,
+    adresse,
+    code_postal,
+    ville,
+    profession,
+    description,
+  };
 
   // cela retire les espaces avant et après à la reception des données
   const cleanClasseList = { titre, adresse, code_postal, ville };
@@ -45,35 +67,68 @@ router.post('/', async (req, res) => {
 
     if (cleanedField !== null) {
       champs[i] = cleanedField;
-    };
-  };
+    }
+  }
 
   // si pas de champs vides ou manquants, création de l'annonce
-  const newAnnonce = new Annonce(champs).save().then(newDoc => res.json({ result: true, newAnnonce: newDoc }))
-})
-
+  const newAnnonce = new Annonce(champs)
+    .save()
+    .then((newDoc) => res.json({ result: true, newAnnonce: newDoc }));
+});
 
 // route pour modifier une annonce
-router.put('/', async (req, res) => {
+router.put("/", async (req, res) => {
   // création des constantes token = req.body.token, titre = req.body.titre...
-  const { id, token, archive, titre, date_de_modification, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description } = req.body;
+  const {
+    id,
+    token,
+    archive,
+    titre,
+    date_de_modification,
+    date_de_debut,
+    date_de_fin,
+    adresse,
+    code_postal,
+    ville,
+    profession,
+    description,
+  } = req.body;
 
   // vérifier que le token existe dans la bdd -
   const isValidToken = await Professionnel.findOne({ token });
 
-  if (!isValidToken) return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+  if (!isValidToken)
+    return res.json({
+      result: false,
+      message: "Token invalide. Accès non autorisé",
+    });
 
   // vérifier si l'id est au bon format -
-  if (!checkIdFormat(id)) return res.json({ result: false, error: 'ID d\'annonce invalide' });
+  if (!checkIdFormat(id))
+    return res.json({ result: false, error: "ID d'annonce invalide" });
 
   // vérifier que l'annonce existe dans la bdd -  (async donc result décalé)
   const isValidAnnonce = await Annonce.findById(id);
 
-  if (!isValidAnnonce) return res.json({ result: false, message: 'Annonce pas trouvée ou archivée' });
+  if (!isValidAnnonce)
+    return res.json({
+      result: false,
+      message: "Annonce pas trouvée ou archivée",
+    });
 
   // variable de liste des champs modifiables
   // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
-  let champs = { titre, date_de_modification, date_de_debut, date_de_fin, adresse, code_postal, ville, profession, description };
+  let champs = {
+    titre,
+    date_de_modification,
+    date_de_debut,
+    date_de_fin,
+    adresse,
+    code_postal,
+    ville,
+    profession,
+    description,
+  };
 
   // cela retire les espaces avant et après à la reception des données
   const cleanClasseList = { titre, adresse, code_postal, ville };
@@ -83,64 +138,87 @@ router.put('/', async (req, res) => {
 
     if (cleanedField !== null) {
       champs[i] = cleanedField;
-    };
-  };
+    }
+  }
 
   // envoyer les modifications
   const updateResult = await Annonce.updateOne({ _id: id }, champs);
 
   if (updateResult.modifiedCount > 0) {
     console.log(updateResult);
-    return res.json({ result: true, message: 'Mise à jour réussie !' });
+    return res.json({ result: true, message: "Mise à jour réussie !" });
   } else {
-    return res.json({ result: false, message: 'Aucun changement effectuée' });
-  };
+    return res.json({ result: false, message: "Aucun changement effectuée" });
+  }
 });
 
-
 // route pour archiver une annonce
-router.put('/archive', async (req, res) => {
+router.put("/archive", async (req, res) => {
   // création des constantes token = req.body.token, titre = req.body.titre...
   const { id, token, archive } = req.body;
 
   // todo - faire en un module
   // Vérifiez si la valeur "archive" est un Boolean
-    if(typeof archive !== 'boolean'){
-    res.json({ result: false, error: 'envoi moi un booléen stp'});
+  if (typeof archive !== "boolean") {
+    res.json({ result: false, error: "envoi moi un booléen stp" });
     return;
-  };
+  }
 
   // vérifier que le token existe dans la bdd -
   const isValidToken = await Professionnel.findOne({ token });
 
-  if (!isValidToken) return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+  if (!isValidToken)
+    return res.json({
+      result: false,
+      message: "Token invalide. Accès non autorisé",
+    });
 
   // vérifier si l'id est au bon format -
-  if (!checkIdFormat(id)) return res.json({ result: false, error: 'ID d\'annonce invalide' });
+  if (!checkIdFormat(id))
+    return res.json({ result: false, error: "ID d'annonce invalide" });
 
   // vérifier que l'annonce existe dans la bdd -  (async donc result décalé)
   const isValidAnnonce = await Annonce.findById(id);
 
-  if (!isValidAnnonce) return res.json({ result: false, message: 'Annonce pas trouvée ou archivée' });
+  if (!isValidAnnonce)
+    return res.json({
+      result: false,
+      message: "Annonce pas trouvée ou archivée",
+    });
 
   // envoyer la modification pour archivage de l'annonce
   const updateResult = await Annonce.updateOne({ _id: id }, { archive });
 
   if (updateResult.modifiedCount > 0) {
     console.log(updateResult);
-    return res.json({ result: true, message: 'Mise à jour réussie!' });
+    return res.json({ result: true, message: "Mise à jour réussie!" });
   } else {
-    return res.json({ result: false, message: 'Aucun changement effectuée' });
-  };
+    return res.json({ result: false, message: "Aucun changement effectuée" });
+  }
 });
 
-
 // route get pour récupérer toutes les annonces
-router.get('/', async (req, res) => {
-  Annonce.find()
-  .then(data => {
-    res.json({ result: true, Annonce: data})
-  }) 
-})
+router.get("/", async (req, res) => {
+  Annonce.find().then((data) => {
+    res.json({ result: true, Annonce: data });
+  });
+});
 
-module.exports = router
+// route pour récupérer une annonce by id
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  // vérifier si l'id est au bon format -
+  if (!checkIdFormat(id))
+    return res.json({ result: false, error: "ID d'annonce invalide" });
+
+  const annonce = await Annonce.findById(id);
+
+  if (!annonce) {
+    return res.json({ result: false, message: "Annonce non trouvée" });
+  }
+
+  res.json({ result: true, annonce });
+});
+
+module.exports = router;
