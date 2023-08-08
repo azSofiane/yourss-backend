@@ -1,9 +1,13 @@
 var express = require('express');
 var router = express.Router();
-const { isValidEmail } = require('@modules/emailValidator');
-const {isStrongPassword} = require('@modules/passwordValidator');
+
 const bcrypt = require('bcrypt');
+
 const Professionnel = require('@models/professionnels');
+const Annonce = require("@models/annonces");
+
+const { isValidEmail } = require('@modules/emailValidator');
+const { isStrongPassword } = require('@modules/passwordValidator');
 const { cleanSpace } = require('@modules/cleanSpace');
 
 // Route qui verifie un token
@@ -104,7 +108,7 @@ router.put('/editmotdepasse/:token', async (req, res) => {
   }
 });
 
-// route pour récupérer un profil élève avec un token
+// Route pour récupérer un profil élève avec un token
 router.get("/01/:token", async (req, res) => {
   const { token } = req.params.token;
 
@@ -115,5 +119,31 @@ router.get("/01/:token", async (req, res) => {
   res.json({ result: true, professionnels });
 });
 
+// Route pour récuperer les annonces avec l'ID qu'a posté un professionnel en vérifiant son token.
+router.get("annonces/:token/:id", async (req, res) => {
+
+  // vérifier que le token existe dans la bdd -
+    const isValidToken = await Professionnel.findOne({ token });
+  
+    if (!isValidToken)
+      return res.json({
+        result: false,
+        message: "Token invalide. Accès non autorisé",
+      });
+  
+    // vérifier si l'id est au bon format -
+    const { id } = req.params;
+    if (!checkIdFormat(id))
+      return res.json({ result: false, error: "ID d'annonce invalide" });
+  
+    const annonce = await Annonce.findById(id);
+  
+    if (!annonce) {
+      return res.json({ result: false, message: "Annonce non trouvée" });
+    }
+    res.json({ result: true, annonce });
+  
+  });
+  
 
 module.exports = router;

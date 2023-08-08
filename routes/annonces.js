@@ -26,6 +26,7 @@ router.post("/", async (req, res) => {
     ville,
     profession,
     description,
+    professionnel,
   } = req.body;
 
   // todo - remettre 'date_de_creation', 'token' et le control sur checkbody
@@ -40,9 +41,11 @@ router.post("/", async (req, res) => {
 
   // todo - remettre control sur verif du token
   if (!isValidToken) {
-    // return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+    return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
   }
+  // const professionnelObjectId = isValidToken._id; // Assurez-vous que "_id" est le bon champ
 
+console.log(isValidToken);
   // todo - remettre dates :
   // variable de liste des champs modifiables
   // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
@@ -57,6 +60,7 @@ router.post("/", async (req, res) => {
     ville,
     profession,
     description,
+    professionnel,
   };
 
   // cela retire les espaces avant et après à la reception des données
@@ -69,7 +73,7 @@ router.post("/", async (req, res) => {
       champs[i] = cleanedField;
     }
   }
-
+console.log(champs);
   // si pas de champs vides ou manquants, création de l'annonce
   const newAnnonce = new Annonce(champs)
     .save()
@@ -163,5 +167,6 @@ router.get("/:id", async (req, res) => {
 
   res.json({ result: true, annonce });
 });
+
 
 module.exports = router;
