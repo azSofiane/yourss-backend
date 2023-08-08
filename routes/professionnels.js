@@ -103,4 +103,17 @@ router.put('/editmotdepasse/:token', async (req, res) => {
     return res.json({ result: false, message: 'Aucun changement effectuée' });
   }
 });
+
+// route pour récupérer un profil élève avec un token
+router.get("/01/:token", async (req, res) => {
+  const { token } = req.params.token;
+
+  const professionnels = await Professionnel.findOne(token);
+  if (!professionnels) {
+    return res.json({ result: false, message: "Profil non trouvée" });
+  }
+  res.json({ result: true, professionnels });
+});
+
+
 module.exports = router;

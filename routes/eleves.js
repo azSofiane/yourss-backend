@@ -157,4 +157,17 @@ router.put("/editmotdepasse/:token", async (req, res) => {
   }
 });
 
+
+// route pour récupérer un profil élève avec un token
+router.get("/02/:token", async (req, res) => {
+  const eleves = await Eleve.findOne({ token: req.params.token });
+
+  if (!eleves) {
+    return res.json({ result: false, message: "Profil non trouvée" });
+  }
+  
+  res.json({ result: true, eleves });
+});
+
+
 module.exports = router;
