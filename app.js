@@ -44,7 +44,7 @@ app.use('/connexion', connexionRouter)
 app.use('/reinisialisermdp', reinisialisermdpRouter)
 
 app.use('/eleves', elevesRouter)
-app.use('/eleves/recherche', elevesRechercheRouter)
+app.use('/elevesRecherche', elevesRechercheRouter)
 
 app.use('/professionnels', professionnelsRouter)
 
