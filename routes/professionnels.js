@@ -8,9 +8,11 @@ const Annonce = require("@models/annonces");
 
 const { isValidEmail } = require('@modules/emailValidator');
 const { isStrongPassword } = require('@modules/passwordValidator');
+const Eleve = require('@models/eleves');
 const { cleanSpace } = require('@modules/cleanSpace');
 
 // Route qui verifie un token
+//Todo refaire le non de la route
 router.get('/:token', (req, res) => {
   Professionnel.findOne({ token: req.params.token })
   .select('-_id -email -mot_de_passe -token -fonction')
@@ -145,5 +147,25 @@ router.get("annonces/:token/:id", async (req, res) => {
   
   });
   
+//route de filtrage par date des élèves
+//Todo refaire le non de la route
+router.get("/recherche/eleves", (req, res) => {
+  Eleve.find().then((data) => {
+    console.log("Données de la requête:", data);
+    const currentDate = new Date()
+    // Filtre si la date de recherche du stage de l'eleve ne dépasse pas la date d'aujourd'hui
+    const filteredEleves = data.filter((item) => {
+      const dateDebut = item.date_de_debut;
+      return dateDebut ? new Date(dateDebut) < currentDate : true;
+    });
+
+  return res.json({
+    result: true,
+    nombre_eleve: filteredEleves.length,
+    eleve: filteredEleves,
+  });
+});
+});
+
 
 module.exports = router;
