@@ -21,18 +21,18 @@ const annoncesSchema = mongoose.Schema({
     ref: 'profs'
   },
   eleves_postulants: [{
-    type: mongoose.Schema.Types.ObjectId,
-      eleve: {
+    eleve: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'eleves'
     },
     statut: {
       type: String,
       default: 'en cours'
-    }
-  }]
+    },
+    message: String
+  }, { versionKey: false }]
 }, { versionKey: false })
 
-const Ann = mongoose.model('annonces', annoncesSchema)
+const Annonce = mongoose.model('annonces', annoncesSchema)
 
-module.exports = Ann
+module.exports = Annonce

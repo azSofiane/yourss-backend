@@ -4,10 +4,12 @@ var router = express.Router();
 const bcrypt = require("bcrypt");
 
 const Eleve = require("@models/eleves");
+const Annonce = require("@models/annonces");
 
 const { isValidEmail } = require("@modules/emailValidator");
 const { isStrongPassword } = require("@modules/passwordValidator");
 const { cleanSpace } = require("@modules/cleanSpace");
+const { checkIdFormat } = require("@modules/checkIdFormat");
 
 // Route qui verifie un token
 router.get("/:token", (req, res) => {
@@ -154,6 +156,67 @@ router.put("/editmotdepasse/:token", async (req, res) => {
     return res.json({ result: true, message: "Mise à jour réussie !" });
   } else {
     return res.json({ result: false, message: "Aucun changement effectuée" });
+  }
+});
+
+// Route postuler à une annonce
+router.put("/postuler/:id/:token", async (req, res) => {
+  const currentDate = new Date();
+
+  console.log('lhm', req.body.message)
+
+
+
+  // 1/7 - Vérifier que le token existe dans la bdd
+  const isValidToken = await Eleve.findOne({ token: req.params.token });
+  if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
+
+
+
+  // 2/7 - Vérifier si l'id est au bon format
+  if (!checkIdFormat(req.params.id)) return res.json({ result: false, message: "ID d'annonce invalide 🫣" });
+
+
+
+  // 3/7 - Vérifier que l'annonce existe dans la bdd - (async donc result décalé)
+  const annonce = await Annonce.findById(req.params.id);
+  if (!annonce ) return res.json({ result: false, message: "Annonce pas trouvée 🫣" }); // si pas trouvée
+
+
+
+  // 4/7 - Vérifier si l'annonce est archivé
+  if (annonce.archive) return res.json({ result: false, message: "Annonce archivée 🫣" });
+
+
+
+  // 5/7 - Vérifier si la date de publication est inférieur à la date du jour
+  if (annonce.date_de_publication > currentDate) return res.json({ result: false, message: "Annonce pas encore publiée 🫣" });
+
+
+
+  // 6/7 - Vérifier si la date de fin est inférieur à la date
+  if (annonce.date_de_fin < currentDate) return res.json({ result: false, message: "Annonce expirée 🫣" });
+
+
+
+  // 7/7 - Vérifier si l'ID de l'élève existe déjà dans la liste eleves_postulants
+  const eleveExists = annonce.eleves_postulants.some(data => data.eleve.toString() === isValidToken.id.toString());
+  if (eleveExists) return res.json({ result: false, message: "Déjà postulé 🫣" }); // si existe déjà
+
+
+
+  // Ajouter le nouvel élève à la liste existante
+  annonce.eleves_postulants.push({ eleve: isValidToken.id, message: req.body.message });
+
+
+
+  // Envoyer les modifications
+  const updateResult = await Annonce.updateOne({ _id: req.params.id }, { eleves_postulants: annonce.eleves_postulants });
+
+  if (updateResult.modifiedCount > 0) {
+    return res.json({ result: true, message: "Ta candidature est envoyé 🥳" });
+  } else {
+    return res.json({ result: false, message: "Ta candidature n'a pu être envoyé 😔" });
   }
 });
 
