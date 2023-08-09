@@ -159,11 +159,11 @@ router.put("/editmotdepasse/:token", async (req, res) => {
   }
 });
 
+
+
 // Route postuler à une annonce
 router.put("/postuler/:id/:token", async (req, res) => {
   const currentDate = new Date();
-
-  console.log('lhm', req.body.message)
 
 
 
@@ -218,6 +218,44 @@ router.put("/postuler/:id/:token", async (req, res) => {
   } else {
     return res.json({ result: false, message: "Ta candidature n'a pu être envoyé 😔" });
   }
+});
+
+
+
+// route pour récupérer un profil élève avec un token
+router.get("/02/:token", async (req, res) => {
+  const eleves = await Eleve.findOne({ token: req.params.token });
+
+  if (!eleves) {
+    return res.json({ result: false, message: "Profil non trouvée" });
+  }
+
+  res.json({ result: true, eleves });
+});
+
+
+
+//Route filtrage des annonces
+//Todo refaire le non de la route
+router.get("/recherche/annonce", async (req, res) => {
+  Annonce.find().then((data) => {
+    const currentDate = new Date();
+
+    // Filtre si l'annonce n'est pas archivée (archive=false), que la date de fin de l'annonce (si elle existe) ne dépasse pas la date d'aujourd'hui, et que la date de publication (si elle existe) est inférieure ou égale à la date d'aujourd'hui
+    const filteredAnnonce = data.filter(
+      (item) =>
+        !item.archive &&
+        (!item.date_de_fin || new Date(item.date_de_fin) >= currentDate) &&
+        (!item.date_de_publication ||
+          new Date(item.date_de_publication) <= currentDate)
+    );
+
+    return res.json({
+      result: true,
+      nombre_annonce: filteredAnnonce.length,
+      annonce: filteredAnnonce,
+    });
+  });
 });
 
 module.exports = router;
