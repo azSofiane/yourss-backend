@@ -167,5 +167,41 @@ router.get("/recherche/eleves", (req, res) => {
 });
 });
 
+  router.get("/mesannonces/:token", async (req, res)=> {
+  
+   // vérifier que le token existe dans la bdd
+   const isValidToken = await Professionnel.findOne({ token: req.params.token });
+
+   if (!isValidToken) {
+     return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+   }
+
+  Annonce.find().then((data)=> { 
+
+  const mesannonces = data.filter(e => 
+    (e.professionnel.toString() === isValidToken.id.toString())
+  )
+  if (!mesannonces) {
+    return res.json({ result: false, message: "Annonce non trouvée" });
+  }
+  return res.json({ 
+    result: true, 
+    nombre_annonces: mesannonces.length,
+    annonces: mesannonces
+  });
+
+
+
+  })
+
+
+
+  // const filteredEleves = data.filter((item) => {
+  //   const dateDebut = item.date_de_debut;
+  //   return dateDebut ? new Date(dateDebut) < currentDate : true;
+  // });
+}
+
+)
 
 module.exports = router;
