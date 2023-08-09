@@ -149,15 +149,16 @@ router.get("annonces/:token/:id", async (req, res) => {
   
 //route de filtrage par date des élèves
 //Todo refaire le non de la route
-router.get("/recherche/eleves", (req, res) => {
+router.get("/recherche/eleves/:token", (req, res) => {
   Eleve.find().then((data) => {
-    console.log("Données de la requête:", data);
+    // console.log("Données de la requête:", data);
     const currentDate = new Date()
-    // Filtre si la date de recherche du stage de l'eleve ne dépasse pas la date d'aujourd'hui
-    const filteredEleves = data.filter((item) => {
-      const dateDebut = item.date_de_debut;
-      return dateDebut ? new Date(dateDebut) < currentDate : true;
-    });
+    // Filtre si la date de recherche du stage de l'eleve n'est pas antérieur à la date d'aujourd'hui
+    const filteredEleves = data.filter(item => 
+      item.date_de_debut >= currentDate 
+      // const dateDebut = item.date_de_debut;
+      // return dateDebut ? new Date(dateDebut) <= currentDate : true;
+    );
 
   return res.json({
     result: true,
