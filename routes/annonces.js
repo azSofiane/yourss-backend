@@ -3,6 +3,7 @@ var router = express.Router();
 
 // import modelè annonce
 const Annonce = require("@models/annonces");
+const Eleve = require("@models/eleves");
 const Professionnel = require("@models/professionnels");
 
 // import du modul de controle des champs
@@ -11,7 +12,7 @@ const { checkIdFormat } = require("@modules/checkIdFormat");
 const { cleanSpace } = require("@modules/cleanSpace");
 
 // route pour création d'une annonce par le professionnel
-router.post("/", async (req, res) => {
+router.post("/create/", async (req, res) => {
   // todo - remettre
   // création des constantes token = req.body.token, titre = req.body.titre...
   const {
@@ -145,27 +146,34 @@ router.put("/edit/:id", async (req, res) => {
 });
 
 // route get pour récupérer toutes les annonces
-router.get("/", async (req, res) => {
+router.get("/all/", async (req, res) => {
   Annonce.find().then((data) => {
     res.json({ result: true, Annonce: data });
   });
 });
 
-// route pour récupérer une annonce by id
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
+// route pour récupérer une annonce via sont id
+router.get("/id/:id", async (req, res) => {
+  // vérifier si l'id est au bon format
+  if (!checkIdFormat(req.params.id)) return res.json({ result: false, error: "ID d'annonce invalide" });
 
-  // vérifier si l'id est au bon format -
-  if (!checkIdFormat(id))
-    return res.json({ result: false, error: "ID d'annonce invalide" });
 
-  const annonce = await Annonce.findById(id);
 
-  if (!annonce) {
-    return res.json({ result: false, message: "Annonce non trouvée" });
-  }
+  // chercher si l'annonce existe + regarder le token des éléves qui ont postulés
+  const annonce = await Annonce.findById(req.params.id).populate('eleves_postulants.eleve');
+  if (!annonce) return res.json({ result: false, message: "Annonce non trouvée" }); // si l'annonce existe pas
 
-  res.json({ result: true, annonce });
+
+
+  // changement de l'id des éléves qui postule par leurs token
+  const changeIdToTokenEleve = {
+    ...annonce.toObject(),
+    eleves_postulants: annonce.eleves_postulants.map(postulant => ({ eleve: postulant.eleve.token, statut: postulant.statut, message: postulant.message }))
+  };
+
+
+  // si tout bon, envoyer le résultat
+  res.json({ result: true, annonce: changeIdToTokenEleve });
 });
 
 
