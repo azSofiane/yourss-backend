@@ -12,7 +12,7 @@ const { checkIdFormat } = require("@modules/checkIdFormat");
 const { cleanSpace } = require("@modules/cleanSpace");
 
 // route pour création d'une annonce par le professionnel
-router.post("/create/", async (req, res) => {
+router.post("/create/:token", async (req, res) => {
   // todo - remettre
   // création des constantes token = req.body.token, titre = req.body.titre...
   const {
@@ -37,7 +37,9 @@ router.post("/create/", async (req, res) => {
   }
 
   // vérifier que le token existe dans la bdd
-  const isValidToken = await Professionnel.findOne({ token: token });
+  const isValidToken = await Professionnel.findOne({ token: req.params.token });
+
+  console.log(isValidToken);
 
   // todo - remettre control sur verif du token
   if (!isValidToken) {
