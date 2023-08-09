@@ -160,8 +160,6 @@ router.put("/editmotdepasse/:token", async (req, res) => {
 });
 
 
-<<<<<<< HEAD
-=======
 
 // Route postuler à une annonce
 router.put("/postuler/:id/:token", async (req, res) => {
@@ -224,7 +222,6 @@ router.put("/postuler/:id/:token", async (req, res) => {
 
 
 
->>>>>>> 8cd5e5fde0fd161970dfe246b88d32d800e65def
 // route pour récupérer un profil élève avec un token
 router.get("/02/:token", async (req, res) => {
   const eleves = await Eleve.findOne({ token: req.params.token });
