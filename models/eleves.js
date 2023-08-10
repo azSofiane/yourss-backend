@@ -18,7 +18,10 @@ const elevesSchema = mongoose.Schema({
   motivation: String,
   ville: String,
   code_postal: String,
-  disponible: Boolean,
+  disponible: {
+    type: Boolean,
+    default: true
+  },
   date_de_debut: Date,
   date_de_fin: Date,
   ma_recherche_de_stage: String,
