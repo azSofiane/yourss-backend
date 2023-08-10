@@ -18,7 +18,7 @@ const annoncesSchema = mongoose.Schema({
   },
   professionnel: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'profs'
+    ref: 'professionnels'
   },
   eleves_postulants: [{
     eleve: {
@@ -30,7 +30,7 @@ const annoncesSchema = mongoose.Schema({
       default: 'en cours'
     },
     message: String
-  }, { versionKey: false }]
+  }]
 }, { versionKey: false })
 
 const Annonce = mongoose.model('annonces', annoncesSchema)

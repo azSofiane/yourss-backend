@@ -28,6 +28,7 @@ router.put("/edit/:token", async (req, res) => {
     nom,
     prenom,
     photos,
+    date_de_naissance,
     etablissement,
     presentation,
     motivation,
@@ -45,6 +46,7 @@ router.put("/edit/:token", async (req, res) => {
     nom,
     prenom,
     photos,
+    date_de_naissance,
     etablissement,
     presentation,
     motivation,
@@ -194,7 +196,7 @@ router.put("/postuler/:id/:token", async (req, res) => {
 
 
 
-  // 6/7 - Vérifier si la date de fin est inférieur à la date
+  // 6/7 - Vérifier si la date de fin est inférieur à la date du jour
   if (annonce.date_de_fin < currentDate) return res.json({ result: false, message: "Annonce expirée 🫣" });
 
 
@@ -237,7 +239,13 @@ router.get("/02/:token", async (req, res) => {
 
 //Route filtrage des annonces
 //Todo refaire le non de la route
-router.get("/recherche/annonce", async (req, res) => {
+router.get("/recherche/annonce/:token", async (req, res) => {
+  // Vérifier que le token existe dans la bdd
+  const isValidToken = await Eleve.findOne({ token: req.params.token });
+  if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
+
+  console.log("id élève", isValidToken.id);
+
   Annonce.find().then((data) => {
     const currentDate = new Date();
 
@@ -249,13 +257,50 @@ router.get("/recherche/annonce", async (req, res) => {
         (!item.date_de_publication ||
           new Date(item.date_de_publication) <= currentDate)
     );
+          
+    console.log(filteredAnnonce);
 
+    
     return res.json({
       result: true,
       nombre_annonce: filteredAnnonce.length,
       annonce: filteredAnnonce,
+      eleve: isValidToken.token
     });
   });
+});
+
+
+
+
+// Route pour récupérer mes annonces favoris
+router.get("/mesfavoris/:token", async (req, res)=> {
+  // 1/7 - Vérifier que le token existe dans la bdd
+  const isValidToken = await Eleve.findOne({ token: req.params.token });
+  if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
+
+  
+  
+  Annonce.find().then((data)=> { 
+    
+    console.log(data);
+    
+    return res.json({ result: false, message: "Edwin test", a: data });
+    
+//   const mesannoncesfavoris = data.filter(e => 
+//   (e.eleves.toString() === isValidToken.id.toString()))
+//  if (!mesannoncesfavoris) {
+//    return res.json({ result: false, message: "Annonce non trouvée" });
+//  }
+//  console.log(data)
+//  return res.json({ 
+//    result: true, 
+//    nombre_annonces: mesannoncesfavoris.length,
+//    annonces: mesannoncesfavoris
+//  });
+
+})
+
 });
 
 module.exports = router;
