@@ -148,18 +148,38 @@ router.get("annonces/:token/:id", async (req, res) => {
 
   });
 
-//route de filtrage par date des élèves
+// route de filtrage par date des élèves
 //Todo refaire le non de la route
-router.get("/recherche/eleves/:token", (req, res) => {
+router.get("/recherche/eleves/:token", async (req, res) => {
+  const currentDate = new Date()
+
+  // 1/7 - Vérifier que le token existe dans la bdd
+  const isValidToken = await Professionnel.findOne({ token: req.params.token });
+  if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé => out
+
+  // recherche des élèves dans la bdd
   Eleve.find().then((data) => {
-    // console.log("Données de la requête:", data);
-    const currentDate = new Date()
+
     // Filtre si la date de recherche du stage de l'eleve n'est pas antérieur à la date d'aujourd'hui
-    const filteredEleves = data.filter(item =>
-      item.date_de_debut >= currentDate
-      // const dateDebut = item.date_de_debut;
-      // return dateDebut ? new Date(dateDebut) <= currentDate : true;
-    );
+    const filteredEleves = data
+    .filter(item => item.date_de_fin > currentDate && item.disponible )
+    .map(item => {
+      console.log("log items ",item);
+      return {
+        nom: item.nom,
+        prenom: item.prenom,
+        photos: item.photos,
+        ville: item.ville,
+        code_postal: item.code_postal,
+        date_de_debut: item.date_de_debut,
+        date_de_fin: item.date_de_fin,
+        mot_cle: item.mot_cle,
+        etablissement: item.etablissement,
+        motivation: item.motivation,
+        ma_recherche_de_stage: item.ma_recherche_de_stage,
+        token: item.token
+      };
+    });
 
   return res.json({
     result: true,
