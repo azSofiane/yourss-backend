@@ -153,14 +153,14 @@ router.get("annonces/:token/:id", async (req, res) => {
 router.get("/recherche/eleves/:token", async (req, res) => {
   const currentDate = new Date()
 
-  // 1/7 - Vérifier que le token existe dans la bdd
+  // 1/3 - Vérifier que le token existe dans la bdd
   const isValidToken = await Professionnel.findOne({ token: req.params.token });
   if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé => out
 
-  // recherche des élèves dans la bdd
+  // 2/3 recherche des élèves dans la bdd
   Eleve.find().then((data) => {
 
-    // Filtre si la date de recherche du stage de l'eleve n'est pas antérieur à la date d'aujourd'hui
+    // 3/3 Filtre si la date de recherche du stage de l'eleve n'est pas antérieur à la date d'aujourd'hui
     const filteredEleves = data
     .filter(item => item.date_de_fin > currentDate && item.disponible )
     .map(item => {
