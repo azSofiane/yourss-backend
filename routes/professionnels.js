@@ -169,13 +169,14 @@ router.get("/recherche/eleves/:token", (req, res) => {
 });
 });
 
-  router.get("/mesannonces/:token", async (req, res)=> {
+// ROute pour récupérer les annonces que le professionnels vient de poster ( vérifier avec le token du professionnel), et les afficher dans la page "AnnonceList"
+router.get("/mesannonces/:token", async (req, res)=> {
 
       // vérifier que le token existe dans la bdd
       const isValidToken = await Professionnel.findOne({ token: req.params.token });
 
       if (!isValidToken) {
-        return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+        return res.json({ result: false, message: 'Token invalide. Accès non autorisé 🫣' });
       }
       Annonce.find().then((data)=> {
 

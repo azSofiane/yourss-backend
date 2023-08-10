@@ -240,7 +240,6 @@ router.get("/02/:token", async (req, res) => {
 //Route filtrage des annonces
 //Todo refaire le non de la route
 router.get("/recherche/annonce/:token", async (req, res) => {
-
   // Vérifier que le token existe dans la bdd
   const isValidToken = await Eleve.findOne({ token: req.params.token });
   if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
@@ -276,30 +275,28 @@ router.get("/recherche/annonce/:token", async (req, res) => {
 
 // Route pour récupérer mes annonces favoris
 router.get("/mesfavoris/:token", async (req, res)=> {
-  
-  // vérifier que le token existe dans la bdd
+  // 1/7 - Vérifier que le token existe dans la bdd
   const isValidToken = await Eleve.findOne({ token: req.params.token });
+  if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
 
-  if (!isValidToken) {
-    return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
-  }
+  // return res.json({ result: false, message: "Annonce non trouvée" });
 
- Annonce.find().then((data)=> { 
-
- const mesannoncesfavoris = data.filter(e => 
-   (e.professionnel.toString() === isValidToken.id.toString())
- )
- if (!mesannoncesfavoris) {
-   return res.json({ result: false, message: "Annonce non trouvée" });
- }
- return res.json({ 
-   result: true, 
-   nombre_annonces: mesannoncesfavoris.length,
-   annonces: mesannoncesfavoris
- });
+  
+//   Annonce.find().then((data)=> { 
+//   const mesannoncesfavoris = data.filter(e => 
+//   (e.eleves.toString() === isValidToken.id.toString()))
+//  if (!mesannoncesfavoris) {
+//    return res.json({ result: false, message: "Annonce non trouvée" });
+//  }
+//  console.log(data)
+//  return res.json({ 
+//    result: true, 
+//    nombre_annonces: mesannoncesfavoris.length,
+//    annonces: mesannoncesfavoris
+//  });
 
 })
 
-});
+// });
 
 module.exports = router;
