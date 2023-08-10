@@ -3,13 +3,14 @@ var router = express.Router();
 
 const bcrypt = require('bcrypt');
 
-const Professionnel = require('@models/professionnels');
-const Annonce = require("@models/annonces");
-
 const { isValidEmail } = require('@modules/emailValidator');
-const { isStrongPassword } = require('@modules/passwordValidator');
-const Eleve = require('@models/eleves');
+const {isStrongPassword} = require('@modules/passwordValidator');
 const { cleanSpace } = require('@modules/cleanSpace');
+const { checkIdFormat } = require("@modules/checkIdFormat");
+
+const Professionnel = require('@models/professionnels');
+const Eleve = require('@models/eleves');
+const Annonce = require("@models/annonces");
 
 // Route qui verifie un token
 //Todo refaire le non de la route
@@ -126,27 +127,27 @@ router.get("annonces/:token/:id", async (req, res) => {
 
   // vérifier que le token existe dans la bdd -
     const isValidToken = await Professionnel.findOne({ token });
-  
+
     if (!isValidToken)
       return res.json({
         result: false,
         message: "Token invalide. Accès non autorisé",
       });
-  
+
     // vérifier si l'id est au bon format -
     const { id } = req.params;
     if (!checkIdFormat(id))
       return res.json({ result: false, error: "ID d'annonce invalide" });
-  
+
     const annonce = await Annonce.findById(id);
-  
+
     if (!annonce) {
       return res.json({ result: false, message: "Annonce non trouvée" });
     }
     res.json({ result: true, annonce });
-  
+
   });
-  
+
 //route de filtrage par date des élèves
 //Todo refaire le non de la route
 router.get("/recherche/eleves/:token", (req, res) => {
@@ -154,8 +155,8 @@ router.get("/recherche/eleves/:token", (req, res) => {
     // console.log("Données de la requête:", data);
     const currentDate = new Date()
     // Filtre si la date de recherche du stage de l'eleve n'est pas antérieur à la date d'aujourd'hui
-    const filteredEleves = data.filter(item => 
-      item.date_de_debut >= currentDate 
+    const filteredEleves = data.filter(item =>
+      item.date_de_debut >= currentDate
       // const dateDebut = item.date_de_debut;
       // return dateDebut ? new Date(dateDebut) <= currentDate : true;
     );
@@ -169,23 +170,23 @@ router.get("/recherche/eleves/:token", (req, res) => {
 });
 
   router.get("/mesannonces/:token", async (req, res)=> {
-  
+
       // vérifier que le token existe dans la bdd
       const isValidToken = await Professionnel.findOne({ token: req.params.token });
 
       if (!isValidToken) {
         return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
       }
-      Annonce.find().then((data)=> { 
+      Annonce.find().then((data)=> {
 
-      const mesannonces = data.filter(e => 
+      const mesannonces = data.filter(e =>
         (e.professionnel.toString() === isValidToken.id.toString())
       )
       if (!mesannonces) {
         return res.json({ result: false, message: "Annonce non trouvée" });
       }
-      return res.json({ 
-        result: true, 
+      return res.json({
+        result: true,
         nombre_annonces: mesannonces.length,
         annonces: mesannonces
       });
@@ -201,5 +202,48 @@ router.get("/recherche/eleves/:token", (req, res) => {
 }
 
 )
+
+
+// Route accepter ou refuser un eleve
+router.put('/postuler/:id/:token', async (req, res) => {
+  // 1/5 - Vérifier que le token du professionnel existe dans la bdd
+  const isValidToken = await Professionnel.findOne({ token: req.params.token });
+  if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
+
+
+
+  // 2/5 - Vérifier si l'id de l'annonce est au bon format
+  if (!checkIdFormat(req.params.id)) return res.json({ result: false, message: "ID d'annonce invalide 🫣" });
+
+
+
+  // 3/5 - Vérifier que l'annonce existe dans la bdd - (async donc result décalé)
+  const annonce = await Annonce.findById(req.params.id);
+  if (!annonce ) return res.json({ result: false, message: "Annonce pas trouvée 🫣" }); // si pas trouvée
+
+
+
+  // 4/5 - Vérifier que le token de l'eleve existe dans la bdd
+  const isValidTokenEleve = await Eleve.findOne({ token: req.body.token });
+  if (!isValidTokenEleve) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
+
+
+
+  // 5/5 - Vérifier si l'ID de l'élève existe dans la liste eleves_postulants
+  const eleveExists = annonce.eleves_postulants.some(data => data.eleve.toString() === isValidTokenEleve.id.toString());
+  if (!eleveExists) return res.json({ result: false, message: "Eleve n'est plus dans les postulants 🫣" }); // si existe déjà
+
+
+
+  // Envoyer la modification de sont status
+  const updateResult = await Annonce.updateOne({ _id: req.params.id }, { $set: { 'eleves_postulants.$[].statut': req.body.statut } });
+
+  if (updateResult.modifiedCount > 0) {
+    return res.json({ result: true, message: "Status modifié 🥳" });
+  } else {
+    return res.json({ result: false, message: "Status non modifié 😔" });
+  }
+});
+
 
 module.exports = router;

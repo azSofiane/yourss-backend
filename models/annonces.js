@@ -30,7 +30,7 @@ const annoncesSchema = mongoose.Schema({
       default: 'en cours'
     },
     message: String
-  }, { versionKey: false }]
+  }]
 }, { versionKey: false })
 
 const Annonce = mongoose.model('annonces', annoncesSchema)

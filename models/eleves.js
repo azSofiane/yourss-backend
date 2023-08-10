@@ -12,7 +12,7 @@ const elevesSchema = mongoose.Schema({
     default: 'true'
   },
   photos: String,
-  date_de_naissance: String,
+  date_de_naissance: Date,
   etablissement: String,
   presentation: String,
   motivation: String,
