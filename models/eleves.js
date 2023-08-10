@@ -23,10 +23,12 @@ const elevesSchema = mongoose.Schema({
   date_de_fin: Date,
   ma_recherche_de_stage: String,
   mot_cle: String,
-  annonce_favori: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'annonces'
-  }
+  annonces_favoris: [{
+    annonce: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'annonces'
+    }
+  }]
 }, { versionKey: false })
 
 const Eleve = mongoose.model('eleves', elevesSchema)

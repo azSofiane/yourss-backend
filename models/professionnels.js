@@ -16,10 +16,12 @@ const ProfessionnelsSchema = mongoose.Schema({
   parcours_professionnel: String,
   conseil_metier: String,
   resetToken: String,
-  eleve_favori: {
-    type: mongoose.Schema.Types.ObjectId,
+  eleves_favoris: [{
+    eleve:{
+          type: mongoose.Schema.Types.ObjectId,
     ref: 'eleves'
-  }
+    }
+  }]
 }, { versionKey: false })
 
 const Professionnel = mongoose.model('professionnels', ProfessionnelsSchema)
