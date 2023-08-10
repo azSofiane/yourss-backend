@@ -170,30 +170,27 @@ router.get("/recherche/eleves/:token", (req, res) => {
 
   router.get("/mesannonces/:token", async (req, res)=> {
   
-   // vérifier que le token existe dans la bdd
-   const isValidToken = await Professionnel.findOne({ token: req.params.token });
+      // vérifier que le token existe dans la bdd
+      const isValidToken = await Professionnel.findOne({ token: req.params.token });
 
-   if (!isValidToken) {
-     return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
-   }
+      if (!isValidToken) {
+        return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+      }
+      Annonce.find().then((data)=> { 
 
-  Annonce.find().then((data)=> { 
+      const mesannonces = data.filter(e => 
+        (e.professionnel.toString() === isValidToken.id.toString())
+      )
+      if (!mesannonces) {
+        return res.json({ result: false, message: "Annonce non trouvée" });
+      }
+      return res.json({ 
+        result: true, 
+        nombre_annonces: mesannonces.length,
+        annonces: mesannonces
+      });
 
-  const mesannonces = data.filter(e => 
-    (e.professionnel.toString() === isValidToken.id.toString())
-  )
-  if (!mesannonces) {
-    return res.json({ result: false, message: "Annonce non trouvée" });
-  }
-  return res.json({ 
-    result: true, 
-    nombre_annonces: mesannonces.length,
-    annonces: mesannonces
-  });
-
-
-
-  })
+      })
 
 
 
