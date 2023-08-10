@@ -279,10 +279,14 @@ router.get("/mesfavoris/:token", async (req, res)=> {
   const isValidToken = await Eleve.findOne({ token: req.params.token });
   if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
 
-  // return res.json({ result: false, message: "Annonce non trouvée" });
-
   
-//   Annonce.find().then((data)=> { 
+  
+  Annonce.find().then((data)=> { 
+    
+    console.log(data);
+    
+    return res.json({ result: false, message: "Edwin test", a: data });
+    
 //   const mesannoncesfavoris = data.filter(e => 
 //   (e.eleves.toString() === isValidToken.id.toString()))
 //  if (!mesannoncesfavoris) {
@@ -297,6 +301,6 @@ router.get("/mesfavoris/:token", async (req, res)=> {
 
 })
 
-// });
+});
 
 module.exports = router;

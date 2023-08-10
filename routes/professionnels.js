@@ -146,7 +146,7 @@ router.get("annonces/:token/:id", async (req, res) => {
     }
     res.json({ result: true, annonce });
 
-  });
+});
 
 // route de filtrage par date des élèves
 //Todo refaire le non de la route
@@ -191,38 +191,28 @@ router.get("/recherche/eleves/:token", async (req, res) => {
 
 // ROute pour récupérer les annonces que le professionnels vient de poster ( vérifier avec le token du professionnel), et les afficher dans la page "AnnonceList"
 router.get("/mesannonces/:token", async (req, res)=> {
+  // vérifier que le token existe dans la bdd
+  const isValidToken = await Professionnel.findOne({ token: req.params.token });
 
-      // vérifier que le token existe dans la bdd
-      const isValidToken = await Professionnel.findOne({ token: req.params.token });
+  if (!isValidToken) {
+    return res.json({ result: false, message: 'Token invalide. Accès non autorisé 🫣' });
+  }
 
-      if (!isValidToken) {
-        return res.json({ result: false, message: 'Token invalide. Accès non autorisé 🫣' });
-      }
-      Annonce.find().then((data)=> {
+  
+  Annonce.find().sort({ date_de_creation: -1 }).then((data)=> {
+    const mesannonces = data.filter(e => e.professionnel?.toString() === isValidToken.id.toString())
 
-      const mesannonces = data.filter(e =>
-        (e.professionnel.toString() === isValidToken.id.toString())
-      )
-      if (!mesannonces) {
-        return res.json({ result: false, message: "Annonce non trouvée" });
-      }
-      return res.json({
-        result: true,
-        nombre_annonces: mesannonces.length,
-        annonces: mesannonces
-      });
+    if (!mesannonces) {
+      return res.json({ result: false, message: "Annonce non trouvée" });
+    }
 
-      })
-
-
-
-  // const filteredEleves = data.filter((item) => {
-  //   const dateDebut = item.date_de_debut;
-  //   return dateDebut ? new Date(dateDebut) < currentDate : true;
-  // });
-}
-
-)
+    return res.json({
+      result: true,
+      nombre_annonces: mesannonces.length,
+      annonces: mesannonces
+    });
+  })
+});
 
 
 // Route accepter ou refuser un eleve
