@@ -192,12 +192,12 @@ router.put("/postuler/:id/:token", async (req, res) => {
 
 
   // 5/7 - Vérifier si la date de publication est inférieur à la date du jour
-  if (annonce.date_de_publication > currentDate) return res.json({ result: false, message: "Annonce pas encore publiée 🫣" });
+  if (annonce.date_de_publication > currentDate  && annonce.date_de_publication !== null) return res.json({ result: false, message: "Annonce pas encore publiée 🫣" });
 
 
 
   // 6/7 - Vérifier si la date de fin est inférieur à la date du jour
-  if (annonce.date_de_fin < currentDate) return res.json({ result: false, message: "Annonce expirée 🫣" });
+  if (annonce.date_de_fin < currentDate && annonce.date_de_fin !== null) return res.json({ result: false, message: "Annonce expirée 🫣" });
 
 
 
@@ -246,7 +246,7 @@ router.get("/recherche/annonce/:token", async (req, res) => {
 
   console.log("id élève", isValidToken.id);
 
-  Annonce.find().then((data) => {
+  Annonce.find().sort({ date_de_creation: -1 }).then((data) => {
     const currentDate = new Date();
 
     // Filtre si l'annonce n'est pas archivée (archive=false), que la date de fin de l'annonce (si elle existe) ne dépasse pas la date d'aujourd'hui, et que la date de publication (si elle existe) est inférieure ou égale à la date d'aujourd'hui
@@ -257,10 +257,10 @@ router.get("/recherche/annonce/:token", async (req, res) => {
         (!item.date_de_publication ||
           new Date(item.date_de_publication) <= currentDate)
     );
-          
+
     console.log(filteredAnnonce);
 
-    
+
     return res.json({
       result: true,
       nombre_annonce: filteredAnnonce.length,
@@ -279,22 +279,22 @@ router.get("/mesfavoris/:token", async (req, res)=> {
   const isValidToken = await Eleve.findOne({ token: req.params.token });
   if (!isValidToken) return res.json({ result: false, message: "Token invalide. Accès non autorisé 🫣" }); // si pas trouvé
 
-  
-  
-  Annonce.find().then((data)=> { 
-    
+
+
+  Annonce.find().then((data)=> {
+
     console.log(data);
-    
+
     return res.json({ result: false, message: "Edwin test", a: data });
-    
-//   const mesannoncesfavoris = data.filter(e => 
+
+//   const mesannoncesfavoris = data.filter(e =>
 //   (e.eleves.toString() === isValidToken.id.toString()))
 //  if (!mesannoncesfavoris) {
 //    return res.json({ result: false, message: "Annonce non trouvée" });
 //  }
 //  console.log(data)
-//  return res.json({ 
-//    result: true, 
+//  return res.json({
+//    result: true,
 //    nombre_annonces: mesannoncesfavoris.length,
 //    annonces: mesannoncesfavoris
 //  });
