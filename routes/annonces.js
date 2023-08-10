@@ -12,7 +12,7 @@ const { checkIdFormat } = require("@modules/checkIdFormat");
 const { cleanSpace } = require("@modules/cleanSpace");
 
 // route pour création d'une annonce par le professionnel
-router.post("/create/", async (req, res) => {
+router.post("/create/:token", async (req, res) => {
   // todo - remettre
   // création des constantes token = req.body.token, titre = req.body.titre...
   const {
@@ -20,13 +20,12 @@ router.post("/create/", async (req, res) => {
     date_de_publication,
     date_de_debut,
     date_de_fin,
-    token,
     titre,
     adresse,
     code_postal,
     ville,
     profession,
-    description,
+    description
   } = req.body;
 
   // todo - remettre 'date_de_creation', 'token' et le control sur checkbody
@@ -37,13 +36,19 @@ router.post("/create/", async (req, res) => {
   }
 
   // vérifier que le token existe dans la bdd
-  const isValidToken = await Professionnel.findOne({ token: token });
+
+  
+  const isValidToken = await Professionnel.findOne({ token: req.params.token });
+
+  console.log("token",isValidToken);
 
   // todo - remettre control sur verif du token
   if (!isValidToken) {
-    // return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+    return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
   }
+  // const professionnelObjectId = isValidToken._id; // Assurez-vous que "_id" est le bon champ
 
+console.log(isValidToken);
   // todo - remettre dates :
   // variable de liste des champs modifiables
   // let champs = { titre, date_de_debut: dateDebutISO, date_de_fin: dateFinISO, adresse, code_postal, ville, profession, description };
@@ -58,6 +63,7 @@ router.post("/create/", async (req, res) => {
     ville,
     profession,
     description,
+    professionnel: isValidToken.id,
   };
 
   // cela retire les espaces avant et après à la reception des données
@@ -70,7 +76,7 @@ router.post("/create/", async (req, res) => {
       champs[i] = cleanedField;
     }
   }
-
+console.log(champs);
   // si pas de champs vides ou manquants, création de l'annonce
   const newAnnonce = new Annonce(champs)
     .save()
@@ -192,5 +198,6 @@ router.get("/id/:id/:token", async (req, res) => {
   // si tout bon, envoyer le résultat
   res.json({ result: true, annonce: changeIdToTokenEleve });
 });
+
 
 module.exports = router;

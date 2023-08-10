@@ -111,17 +111,55 @@ router.put('/editmotdepasse/:token', async (req, res) => {
   }
 });
 
+// Route pour récupérer un profil élève avec un token
+router.get("/01/:token", async (req, res) => {
+  const { token } = req.params.token;
+
+  const professionnels = await Professionnel.findOne(token);
+  if (!professionnels) {
+    return res.json({ result: false, message: "Profil non trouvée" });
+  }
+  res.json({ result: true, professionnels });
+});
+
+// Route pour récuperer les annonces avec l'ID qu'a posté un professionnel en vérifiant son token.
+router.get("annonces/:token/:id", async (req, res) => {
+
+  // vérifier que le token existe dans la bdd -
+    const isValidToken = await Professionnel.findOne({ token });
+
+    if (!isValidToken)
+      return res.json({
+        result: false,
+        message: "Token invalide. Accès non autorisé",
+      });
+
+    // vérifier si l'id est au bon format -
+    const { id } = req.params;
+    if (!checkIdFormat(id))
+      return res.json({ result: false, error: "ID d'annonce invalide" });
+
+    const annonce = await Annonce.findById(id);
+
+    if (!annonce) {
+      return res.json({ result: false, message: "Annonce non trouvée" });
+    }
+    res.json({ result: true, annonce });
+
+  });
+
 //route de filtrage par date des élèves
 //Todo refaire le non de la route
-router.get("/recherche/eleves", (req, res) => {
+router.get("/recherche/eleves/:token", (req, res) => {
   Eleve.find().then((data) => {
-    console.log("Données de la requête:", data);
+    // console.log("Données de la requête:", data);
     const currentDate = new Date()
-    // Filtre si la date de recherche du stage de l'eleve ne dépasse pas la date d'aujourd'hui
-    const filteredEleves = data.filter((item) => {
-      const dateDebut = item.date_de_debut;
-      return dateDebut ? new Date(dateDebut) < currentDate : true;
-    });
+    // Filtre si la date de recherche du stage de l'eleve n'est pas antérieur à la date d'aujourd'hui
+    const filteredEleves = data.filter(item =>
+      item.date_de_debut >= currentDate
+      // const dateDebut = item.date_de_debut;
+      // return dateDebut ? new Date(dateDebut) <= currentDate : true;
+    );
 
   return res.json({
     result: true,
@@ -131,6 +169,42 @@ router.get("/recherche/eleves", (req, res) => {
 });
 });
 
+  router.get("/mesannonces/:token", async (req, res)=> {
+
+   // vérifier que le token existe dans la bdd
+   const isValidToken = await Professionnel.findOne({ token: req.params.token });
+
+   if (!isValidToken) {
+     return res.json({ result: false, message: 'Token invalide. Accès non autorisé' });
+   }
+
+  Annonce.find().then((data)=> {
+
+  const mesannonces = data.filter(e =>
+    (e.professionnel.toString() === isValidToken.id.toString())
+  )
+  if (!mesannonces) {
+    return res.json({ result: false, message: "Annonce non trouvée" });
+  }
+  return res.json({
+    result: true,
+    nombre_annonces: mesannonces.length,
+    annonces: mesannonces
+  });
+
+
+
+  })
+
+
+
+  // const filteredEleves = data.filter((item) => {
+  //   const dateDebut = item.date_de_debut;
+  //   return dateDebut ? new Date(dateDebut) < currentDate : true;
+  // });
+}
+
+)
 
 
 // Route accepter ou refuser un eleve
