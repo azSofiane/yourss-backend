@@ -37,7 +37,7 @@ router.post("/create/:token", async (req, res) => {
 
   // vérifier que le token existe dans la bdd
 
-  
+
   const isValidToken = await Professionnel.findOne({ token: req.params.token });
 
   console.log("token",isValidToken);

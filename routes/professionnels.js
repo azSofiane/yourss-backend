@@ -164,7 +164,6 @@ router.get("/recherche/eleves/:token", async (req, res) => {
     const filteredEleves = data
     .filter(item => item.date_de_fin > currentDate && item.disponible )
     .map(item => {
-      console.log("log items ",item);
       return {
         nom: item.nom,
         prenom: item.prenom,
@@ -198,7 +197,7 @@ router.get("/mesannonces/:token", async (req, res)=> {
     return res.json({ result: false, message: 'Token invalide. Accès non autorisé 🫣' });
   }
 
-  
+
   Annonce.find().sort({ date_de_creation: -1 }).then((data)=> {
     const mesannonces = data.filter(e => e.professionnel?.toString() === isValidToken.id.toString())
 
@@ -244,10 +243,11 @@ router.put('/postuler/:id/:token', async (req, res) => {
   const eleveExists = annonce.eleves_postulants.some(data => data.eleve.toString() === isValidTokenEleve.id.toString());
   if (!eleveExists) return res.json({ result: false, message: "Eleve n'est plus dans les postulants 🫣" }); // si existe déjà
 
-
+  console.log('id', isValidTokenEleve.id)
+  console.log('token', isValidTokenEleve.token)
 
   // Envoyer la modification de sont status
-  const updateResult = await Annonce.updateOne({ _id: req.params.id }, { $set: { 'eleves_postulants.$[].statut': req.body.statut } });
+  const updateResult = await Annonce.updateOne({ _id: req.params.id }, { $set: { 'eleves_postulants.$[eleve].statut': req.body.statut } }, { arrayFilters: [{ 'eleve.eleve': isValidTokenEleve.id }] });
 
   if (updateResult.modifiedCount > 0) {
     return res.json({ result: true, message: "Status modifié 🥳" });
