@@ -20,7 +20,11 @@ var annoncesRouter = require("@routes/annonces");
 var app = express();
 
 const cors = require("cors");
-app.use(cors());
+const corsOptions = {
+  origin: ['*'], // changer * par les urls du frontend une fois déployé, séparé par des virgule possible aussi d'ajouter sont ip
+  credentials: true
+};
+app.use(cors(corsOptions));
 
 app.use(logger("dev"));
 app.use(express.json());
