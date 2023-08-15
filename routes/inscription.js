@@ -12,7 +12,7 @@ const { isValidEmail } = require('@modules/emailValidator');
 const { isStrongPassword } = require('@modules/passwordValidator');
 
 // Route pour inscription des utilisateurs
-router.post('/', async (req, res) => {
+router.post('/', async (req, res) => {m
   if (!checkBody(req.body, ['nom', 'prenom', 'email', 'mot_de_passe', 'fonction'])) {
     res.json({ result: false, error: 'Champs manquants ou vides' });
     return
