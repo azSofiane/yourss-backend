@@ -23,23 +23,6 @@ uid2
 bcrypt
 ```
 
-Pour les chemins il est possible
-```
-@ // dosier racine
-@models // dossier models
-@modules // dossier modules
-@routes // dossier routes
-```
-
-exemple: au lieu de
-```
-const { checkBody } = require('../modules/checkBody')
-```
-faire
-```
-const { checkBody } = require('@modules/checkBody')
-```
-
 ## modules
 checkBody, permet de vérifier si un ou plusieurs champs sont remplis pour les req.body par exemple
 Ajouter cette ligne au début de votre fichier
