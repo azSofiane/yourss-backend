@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const Annonce = require('@models/annonces');
+const Annonce = require('../models/annonces');
 
 router.get('/', async (req, res) => {
   Annonce.find().then(data => {
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
 
     if (!filteredAnnonce) {
       return res.json({ result: false, error: "pas d'annonces" });
-    } 
+    }
 
     return res.json({ result: true, nombre_annonce: filteredAnnonce.length, annonce: filteredAnnonce });
   });

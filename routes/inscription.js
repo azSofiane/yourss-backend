@@ -4,12 +4,12 @@ var router = express.Router();
 const bcrypt = require('bcrypt');
 const uid2 = require('uid2');
 
-const Eleve = require('@models/eleves');
-const Professionnel = require('@models/professionnels');
+const Eleve = require('../models/eleves');
+const Professionnel = require('../models/professionnels');
 
-const { checkBody } = require('@modules/checkBody');
-const { isValidEmail } = require('@modules/emailValidator');
-const { isStrongPassword } = require('@modules/passwordValidator');
+const { checkBody } = require('../modules/checkBody');
+const { isValidEmail } = require('../modules/emailValidator');
+const { isStrongPassword } = require('../modules/passwordValidator');
 
 // Route pour inscription des utilisateurs
 router.post('/', async (req, res) => {m

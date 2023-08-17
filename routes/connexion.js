@@ -3,11 +3,11 @@ var router = express.Router();
 
 const bcrypt = require('bcrypt');
 
-const Eleve = require('@models/eleves');
-const Professionnel = require('@models/professionnels');
+const Eleve = require('../models/eleves');
+const Professionnel = require('../models/professionnels');
 
-const { checkBody } = require('@modules/checkBody');
-const { isValidEmail } = require('@modules/emailValidator');
+const { checkBody } = require('../modules/checkBody');
+const { isValidEmail } = require('../modules/emailValidator');
 
 // Route pour connexion des utilisateurs
 router.post('/', async (req, res) => {

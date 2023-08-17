@@ -3,14 +3,14 @@ var router = express.Router();
 
 const bcrypt = require('bcrypt');
 
-const { isValidEmail } = require('@modules/emailValidator');
-const {isStrongPassword} = require('@modules/passwordValidator');
-const { cleanSpace } = require('@modules/cleanSpace');
-const { checkIdFormat } = require("@modules/checkIdFormat");
+const { isValidEmail } = require('../modules/emailValidator');
+const {isStrongPassword} = require('../modules/passwordValidator');
+const { cleanSpace } = require('../modules/cleanSpace');
+const { checkIdFormat } = require("../modules/checkIdFormat");
 
-const Professionnel = require('@models/professionnels');
-const Eleve = require('@models/eleves');
-const Annonce = require("@models/annonces");
+const Professionnel = require('../models/professionnels');
+const Eleve = require('../models/eleves');
+const Annonce = require("../models/annonces");
 
 // Route qui verifie un token
 router.get('/token/:token', (req, res) => {
