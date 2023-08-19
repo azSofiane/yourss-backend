@@ -1,6 +1,5 @@
-require("module-alias/register");
 require("dotenv").config();
-require("@config/config");
+require("./config/config");
 
 var path = require("path");
 
@@ -8,23 +7,30 @@ var express = require("express");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
-var indexRouter = require("@routes/index");
+var indexRouter = require("./routes/index");
 
-var inscriptionRouter = require("@routes/inscription");
-var connexionRouter = require("@routes/connexion");
-var reinisialisermdpRouter = require("@routes/reinisialisermdp");
-var elevesRouter = require("@routes/eleves");
-var professionnelsRouter = require("@routes/professionnels");
-var annoncesRouter = require("@routes/annonces");
+var inscriptionRouter = require("./routes/inscription");
+var connexionRouter = require("./routes/connexion");
+var reinisialisermdpRouter = require("./routes/reinisialisermdp");
+var elevesRouter = require("./routes/eleves");
+var professionnelsRouter = require("./routes/professionnels");
+var annoncesRouter = require("./routes/annonces");
 
 var app = express();
 
 const cors = require("cors");
+// changer * par les urls du frontend une fois déployé, séparé par des virgule possible aussi d'ajouter sont ip
+const allowedOrigins = ['*'];
 const corsOptions = {
-  origin: ["http://localhost:3000", "http://localhost:3001"],
-  credentials: true, // Permettre l'envoi des cookies lors des requêtes CORS (si besoin)
-};
-
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true)
+    } else {
+      callback(new Error('Pas autorisé 🫣'))
+    }
+  },
+  credentials: true
+}
 app.use(cors(corsOptions));
 
 app.use(logger("dev"));

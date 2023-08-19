@@ -2,14 +2,14 @@ var express = require("express");
 var router = express.Router();
 
 // import modelè annonce
-const Annonce = require("@models/annonces");
-const Eleve = require("@models/eleves");
-const Professionnel = require("@models/professionnels");
+const Annonce = require("../models/annonces");
+const Eleve = require("../models/eleves");
+const Professionnel = require("../models/professionnels");
 
 // import du modul de controle des champs
-const { checkBody } = require("@modules/checkBody");
-const { checkIdFormat } = require("@modules/checkIdFormat");
-const { cleanSpace } = require("@modules/cleanSpace");
+const { checkBody } = require("../modules/checkBody");
+const { checkIdFormat } = require("../modules/checkIdFormat");
+const { cleanSpace } = require("../modules/cleanSpace");
 
 // route pour création d'une annonce par le professionnel
 router.post("/create/:token", async (req, res) => {
@@ -37,7 +37,7 @@ router.post("/create/:token", async (req, res) => {
 
   // vérifier que le token existe dans la bdd
 
-  
+
   const isValidToken = await Professionnel.findOne({ token: req.params.token });
 
   console.log("token",isValidToken);

@@ -3,16 +3,16 @@ var router = express.Router();
 
 const bcrypt = require("bcrypt");
 
-const Eleve = require("@models/eleves");
-const Annonce = require("@models/annonces");
+const Eleve = require("../models/eleves");
+const Annonce = require("../models/annonces");
 
-const { isValidEmail } = require("@modules/emailValidator");
-const { isStrongPassword } = require("@modules/passwordValidator");
-const { cleanSpace } = require("@modules/cleanSpace");
-const { checkIdFormat } = require("@modules/checkIdFormat");
+const { isValidEmail } = require("../modules/emailValidator");
+const { isStrongPassword } = require("../modules/passwordValidator");
+const { cleanSpace } = require("../modules/cleanSpace");
+const { checkIdFormat } = require("../modules/checkIdFormat");
 
 // Route qui verifie un token
-router.get("/:token", (req, res) => {
+router.get("/token/:token", (req, res) => {
   Eleve.findOne({ token: req.params.token })
     .select("-_id -email -mot_de_passe -token -fonction")
     .then((data) => {
@@ -21,6 +21,8 @@ router.get("/:token", (req, res) => {
       res.json({ result, data });
     });
 });
+
+
 
 // Route pour modifier le profil
 router.put("/edit/:token", async (req, res) => {
@@ -93,6 +95,8 @@ router.put("/edit/:token", async (req, res) => {
   }
 });
 
+
+
 // Route pour modifier le email
 router.put("/editemail/:token", async (req, res) => {
   const { email } = req.body;
@@ -123,6 +127,8 @@ router.put("/editemail/:token", async (req, res) => {
     return res.json({ result: false, message: "Aucun changement effectuée" });
   }
 });
+
+
 
 // Route pour modifier le mot de passe
 router.put("/editmotdepasse/:token", async (req, res) => {
@@ -224,8 +230,8 @@ router.put("/postuler/:id/:token", async (req, res) => {
 
 
 
-// route pour récupérer un profil élève avec un token
-router.get("/02/:token", async (req, res) => {
+// Route pour récupérer un profil élève avec un token
+router.get("/profil/:token", async (req, res) => {
   const eleves = await Eleve.findOne({ token: req.params.token });
 
   if (!eleves) {
@@ -237,8 +243,7 @@ router.get("/02/:token", async (req, res) => {
 
 
 
-//Route filtrage des annonces
-//Todo refaire le non de la route
+// Route filtrage des annonces
 router.get("/recherche/annonce/:token", async (req, res) => {
   // Vérifier que le token existe dans la bdd
   const isValidToken = await Eleve.findOne({ token: req.params.token });
@@ -269,7 +274,6 @@ router.get("/recherche/annonce/:token", async (req, res) => {
     });
   });
 });
-
 
 
 

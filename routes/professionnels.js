@@ -3,18 +3,17 @@ var router = express.Router();
 
 const bcrypt = require('bcrypt');
 
-const { isValidEmail } = require('@modules/emailValidator');
-const {isStrongPassword} = require('@modules/passwordValidator');
-const { cleanSpace } = require('@modules/cleanSpace');
-const { checkIdFormat } = require("@modules/checkIdFormat");
+const { isValidEmail } = require('../modules/emailValidator');
+const {isStrongPassword} = require('../modules/passwordValidator');
+const { cleanSpace } = require('../modules/cleanSpace');
+const { checkIdFormat } = require("../modules/checkIdFormat");
 
-const Professionnel = require('@models/professionnels');
-const Eleve = require('@models/eleves');
-const Annonce = require("@models/annonces");
+const Professionnel = require('../models/professionnels');
+const Eleve = require('../models/eleves');
+const Annonce = require("../models/annonces");
 
 // Route qui verifie un token
-//Todo refaire le non de la route
-router.get('/:token', (req, res) => {
+router.get('/token/:token', (req, res) => {
   Professionnel.findOne({ token: req.params.token })
   .select('-_id -email -mot_de_passe -token -fonction')
   .then(data => {
@@ -23,6 +22,8 @@ router.get('/:token', (req, res) => {
     res.json({ result, data });
   });
 });
+
+
 
 // Route pour modifier le profil
 router.put('/edit/:token', async (req, res) => {
@@ -59,6 +60,8 @@ router.put('/edit/:token', async (req, res) => {
   }
 });
 
+
+
 // Route pour modifier le email
 router.put('/editemail/:token', async (req, res) => {
   const { email } = req.body;
@@ -83,6 +86,8 @@ router.put('/editemail/:token', async (req, res) => {
     return res.json({ result: false, message: 'Aucun changement effectuée' });
   }
 });
+
+
 
 // Route pour modifier le mot de passe
 router.put('/editmotdepasse/:token', async (req, res) => {
@@ -111,8 +116,10 @@ router.put('/editmotdepasse/:token', async (req, res) => {
   }
 });
 
+
+
 // Route pour récupérer un profil élève avec un token
-router.get("/01/:token", async (req, res) => {
+router.get("/profil/:token", async (req, res) => {
   const { token } = req.params.token;
 
   const professionnels = await Professionnel.findOne(token);
@@ -122,8 +129,10 @@ router.get("/01/:token", async (req, res) => {
   res.json({ result: true, professionnels });
 });
 
+
+
 // Route pour récuperer les annonces avec l'ID qu'a posté un professionnel en vérifiant son token.
-router.get("annonces/:token/:id", async (req, res) => {
+router.get("/annonces/:token/:id", async (req, res) => {
 
   // vérifier que le token existe dans la bdd -
     const isValidToken = await Professionnel.findOne({ token });
@@ -148,8 +157,9 @@ router.get("annonces/:token/:id", async (req, res) => {
 
 });
 
-// route de filtrage par date des élèves
-//Todo refaire le non de la route
+
+
+// Route de filtrage par date des élèves
 router.get("/recherche/eleves/:token", async (req, res) => {
   const currentDate = new Date()
 
@@ -164,7 +174,6 @@ router.get("/recherche/eleves/:token", async (req, res) => {
     const filteredEleves = data
     .filter(item => item.date_de_fin > currentDate && item.disponible )
     .map(item => {
-      console.log("log items ",item);
       return {
         nom: item.nom,
         prenom: item.prenom,
@@ -189,7 +198,9 @@ router.get("/recherche/eleves/:token", async (req, res) => {
 });
 });
 
-// ROute pour récupérer les annonces que le professionnels vient de poster ( vérifier avec le token du professionnel), et les afficher dans la page "AnnonceList"
+
+
+// Route pour récupérer les annonces que le professionnels vient de poster ( vérifier avec le token du professionnel), et les afficher dans la page "AnnonceList"
 router.get("/mesannonces/:token", async (req, res)=> {
   // vérifier que le token existe dans la bdd
   const isValidToken = await Professionnel.findOne({ token: req.params.token });
@@ -198,7 +209,7 @@ router.get("/mesannonces/:token", async (req, res)=> {
     return res.json({ result: false, message: 'Token invalide. Accès non autorisé 🫣' });
   }
 
-  
+
   Annonce.find().sort({ date_de_creation: -1 }).then((data)=> {
     const mesannonces = data.filter(e => e.professionnel?.toString() === isValidToken.id.toString())
 
@@ -213,6 +224,7 @@ router.get("/mesannonces/:token", async (req, res)=> {
     });
   })
 });
+
 
 
 // Route accepter ou refuser un eleve
@@ -244,10 +256,11 @@ router.put('/postuler/:id/:token', async (req, res) => {
   const eleveExists = annonce.eleves_postulants.some(data => data.eleve.toString() === isValidTokenEleve.id.toString());
   if (!eleveExists) return res.json({ result: false, message: "Eleve n'est plus dans les postulants 🫣" }); // si existe déjà
 
-
+  console.log('id', isValidTokenEleve.id)
+  console.log('token', isValidTokenEleve.token)
 
   // Envoyer la modification de sont status
-  const updateResult = await Annonce.updateOne({ _id: req.params.id }, { $set: { 'eleves_postulants.$[].statut': req.body.statut } });
+  const updateResult = await Annonce.updateOne({ _id: req.params.id }, { $set: { 'eleves_postulants.$[eleve].statut': req.body.statut } }, { arrayFilters: [{ 'eleve.eleve': isValidTokenEleve.id }] });
 
   if (updateResult.modifiedCount > 0) {
     return res.json({ result: true, message: "Status modifié 🥳" });
