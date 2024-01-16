@@ -19,19 +19,23 @@ var annoncesRouter = require("./routes/annonces");
 var app = express();
 
 const cors = require("cors");
+const corsOptions = {
+  origin: ['https://yourss.vercel.app'],
+  credentials: true
+};
 // changer * par les urls du frontend une fois déployé, séparé par des virgule possible aussi d'ajouter sont ip
 // todo - décommenter ligne 24 à 34 et commenter ligne 37 à 42, lors d'un déploiement
-const allowedOrigins = ['https://yourss.vercel.app'];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true)
-    } else {
-      callback(new Error('Pas autorisé :face_with_peeking_eye:'))
-    }
-  },
-  credentials: true
-}
+// const allowedOrigins = ['https://yourss.vercel.app'];
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     if (allowedOrigins.includes(origin) || !origin) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Pas autorisé :face_with_peeking_eye:'))
+//     }
+//   },
+//   credentials: true
+// }
 
 // si vous souhaitez qu'il soit disponible à tout le monde
 // const corsOptions = {
