@@ -20,8 +20,11 @@ var app = express();
 
 const cors = require("cors");
 const corsOptions = {
-  origin: ['https://yourss.vercel.app'],
-  credentials: true
+  origin: 'https://yourss.vercel.app',
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 // changer * par les urls du frontend une fois déployé, séparé par des virgule possible aussi d'ajouter sont ip
 // todo - décommenter ligne 24 à 34 et commenter ligne 37 à 42, lors d'un déploiement
